@@ -312,6 +312,7 @@
       flex-wrap: wrap;
       padding: 0 18px;
       align-items: center;
+      justify-content: center;
     }
 
     button {
@@ -407,14 +408,20 @@
     }
 
     .cloud-session-actions {
-      display: none;
+      display: flex;
       align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
+      gap: 4px;
+      flex-direction: column;
     }
 
-    .cloud-auth.is-logged-in .cloud-session-actions {
-      display: flex;
+    .cloud-logout-sm {
+      display: none;
+      width: auto;
+      min-height: 0;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      line-height: 1.2;
     }
 
     .cloud-user {
@@ -432,6 +439,12 @@
 
     .cloud-user.is-visible {
       display: inline-flex;
+    }
+
+    .cloud-session-actions.is-visible .cloud-logout-sm {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     footer.credits {
@@ -833,7 +846,10 @@
         <option value="vi">🇻🇳 Tiếng Việt</option>
         <option value="en">🇬🇧 English</option>
       </select>
-      <span class="cloud-user" id="cloudUserStatus">Cloude: chua dang nhap</span>
+      <div class="cloud-session-actions" id="cloudSessionActions">
+        <span class="cloud-user" id="cloudUserStatus">Cloude: chua dang nhap</span>
+        <button type="button" class="danger cloud-logout-sm" onclick="cloudSignOut()">Thoát</button>
+      </div>
     </div>
 
     <section class="login-card">
@@ -852,9 +868,6 @@
           <input type="password" id="cloudPassword" placeholder="Mat khau cloud" autocomplete="current-password" />
           <button type="button" class="btn-sm secondary" id="cloudSubmitBtn" onclick="submitCloudForm()">Tiep tuc</button>
           <button type="button" class="btn-sm light" onclick="hideCloudForm()" data-vi="An" data-en="Hide">An</button>
-        </div>
-        <div class="cloud-session-actions">
-          <button type="button" class="btn-sm danger" onclick="cloudSignOut()" data-vi="Dang xuat" data-en="Sign Out">Dang xuat</button>
         </div>
       </div>
     </section>
@@ -1059,8 +1072,6 @@
     <div class="button-row">
       <button class="success" onclick="saveData()" data-vi="💾 Lưu dữ liệu ngày này" data-en="💾 Save Today's Data">💾 Lưu dữ liệu ngày này</button>
       <button onclick="window.print()" data-vi="🖨️ In / Lưu PDF" data-en="🖨️ Print / Save PDF">🖨️ In / Lưu PDF</button>
-      <button class="secondary" onclick="exportBackup()" data-vi="📥 Tải Backup (JSON)" data-en="📥 Export Backup (JSON)">📥 Tải Backup (JSON)</button>
-      <button class="light" onclick="importBackup()" data-vi="📤 Mở Backup" data-en="📤 Import Backup">📤 Mở Backup</button>
       <button class="danger" onclick="deleteCurrentDate()" data-vi="🗑️ Xóa ngày hiện tại" data-en="🗑️ Delete Current Day">🗑️ Xóa ngày hiện tại</button>
       <span class="status-toast" id="statusMsg"></span>
     </div>
@@ -1303,10 +1314,14 @@
       const status = document.getElementById('cloudUserStatus');
       const authBox = document.querySelector('.cloud-auth');
       const loginCard = document.querySelector('.login-card');
+      const sessionActions = document.getElementById('cloudSessionActions');
       if (!status) return;
       const email = cloudSession && cloudSession.user && cloudSession.user.email;
       status.textContent = email ? `Cloude: ${email}` : 'Cloude: chưa đăng nhập';
       status.classList.toggle('is-visible', Boolean(email));
+      if (sessionActions) {
+        sessionActions.classList.toggle('is-visible', Boolean(email));
+      }
       if (authBox) {
         authBox.classList.toggle('is-logged-in', Boolean(email));
       }
