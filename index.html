@@ -350,6 +350,10 @@
       box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
     }
 
+    .login-card.is-logged-in {
+      display: none;
+    }
+
     .login-card-header {
       display: flex;
       justify-content: space-between;
@@ -414,10 +418,20 @@
     }
 
     .cloud-user {
+      display: none;
       color: var(--muted);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
       white-space: nowrap;
+      margin-left: auto;
+      padding: 4px 8px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #fff;
+    }
+
+    .cloud-user.is-visible {
+      display: inline-flex;
     }
 
     footer.credits {
@@ -775,9 +789,10 @@
 
       .button-row button {
         width: 100%;
-        min-height: 42px;
-        padding: 9px 8px;
-        font-size: 13px;
+        min-height: 38px;
+        padding: 7px 6px;
+        font-size: 12px;
+        line-height: 1.2;
       }
 
       .status-toast {
@@ -818,6 +833,7 @@
         <option value="vi">🇻🇳 Tiếng Việt</option>
         <option value="en">🇬🇧 English</option>
       </select>
+      <span class="cloud-user" id="cloudUserStatus">Cloude: chua dang nhap</span>
     </div>
 
     <section class="login-card">
@@ -825,7 +841,6 @@
         <div>
           <h2>Cloud Login</h2>
         </div>
-        <span class="cloud-user" id="cloudUserStatus">Cloude: chua dang nhap</span>
       </div>
       <div class="cloud-auth">
         <div class="cloud-action-buttons">
@@ -1047,8 +1062,6 @@
       <button class="secondary" onclick="exportBackup()" data-vi="📥 Tải Backup (JSON)" data-en="📥 Export Backup (JSON)">📥 Tải Backup (JSON)</button>
       <button class="light" onclick="importBackup()" data-vi="📤 Mở Backup" data-en="📤 Import Backup">📤 Mở Backup</button>
       <button class="danger" onclick="deleteCurrentDate()" data-vi="🗑️ Xóa ngày hiện tại" data-en="🗑️ Delete Current Day">🗑️ Xóa ngày hiện tại</button>
-      <button class="secondary" onclick="syncToCloud()" data-vi="Cloud: Đồng bộ lên" data-en="Cloud: Upload">Cloud: Đồng bộ lên</button>
-      <button class="light" onclick="loadFromCloud()" data-vi="Cloud: Tải xuống" data-en="Cloud: Download">Cloud: Tải xuống</button>
       <span class="status-toast" id="statusMsg"></span>
     </div>
     <footer class="credits">
@@ -1202,9 +1215,15 @@
       dates.forEach(d => {
         const opt = document.createElement('option');
         opt.value = d;
-        opt.textContent = `${currentLang === 'en' ? 'Date' : 'Ngày'} ${d}`;
+        opt.textContent = formatDisplayDate(d);
         select.appendChild(opt);
       });
+    }
+
+    function formatDisplayDate(dateStr) {
+      const parts = String(dateStr).split('-');
+      if (parts.length !== 3) return dateStr;
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
 
     function renderCustomerPills() {
@@ -1283,11 +1302,16 @@
     function updateCloudAuthUI() {
       const status = document.getElementById('cloudUserStatus');
       const authBox = document.querySelector('.cloud-auth');
+      const loginCard = document.querySelector('.login-card');
       if (!status) return;
       const email = cloudSession && cloudSession.user && cloudSession.user.email;
       status.textContent = email ? `Cloude: ${email}` : 'Cloude: chưa đăng nhập';
+      status.classList.toggle('is-visible', Boolean(email));
       if (authBox) {
         authBox.classList.toggle('is-logged-in', Boolean(email));
+      }
+      if (loginCard) {
+        loginCard.classList.toggle('is-logged-in', Boolean(email));
       }
     }
 
