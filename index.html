@@ -85,10 +85,13 @@
     }
 
     .filter-bar {
+      position: sticky;
+      top: 0;
+      z-index: 900;
       background: #ffffff;
       border: 2px solid var(--primary);
       border-radius: 16px;
-      padding: 16px 20px;
+      padding: 12px 16px;
       margin-bottom: 22px;
       display: flex;
       flex-wrap: wrap;
@@ -96,6 +99,10 @@
       justify-content: space-between;
       gap: 12px;
       box-shadow: 0 4px 12px rgba(31, 78, 121, 0.1);
+    }
+
+    .language-controls {
+      display: none;
     }
 
     .filter-group {
@@ -841,11 +848,13 @@
 
     <!-- THANH CHỌN NGÔN NGỮ THU NHỎ DƯỚI HEADER GÓC PHẢI -->
     <div class="top-lang-bar">
+      <div class="language-controls">
       <label for="langSelect" class="lang-label-sm">🌐 <span data-vi="Ngôn ngữ" data-en="Language">Ngôn ngữ</span>:</label>
       <select id="langSelect" class="lang-select-sm" onchange="switchLang(this.value)">
         <option value="vi">🇻🇳 Tiếng Việt</option>
         <option value="en">🇬🇧 English</option>
       </select>
+      </div>
       <div class="cloud-session-actions" id="cloudSessionActions">
         <span class="cloud-user" id="cloudUserStatus">Cloude: chua dang nhap</span>
         <button type="button" class="danger cloud-logout-sm" onclick="cloudSignOut()">Thoát</button>
@@ -1070,7 +1079,7 @@
 
   <div class="actions">
     <div class="button-row">
-      <button class="success" onclick="saveData()" data-vi="💾 Lưu dữ liệu ngày này" data-en="💾 Save Today's Data">💾 Lưu dữ liệu ngày này</button>
+      <button class="success" onclick="saveData()" data-vi="Cập nhật" data-en="Update">Cập nhật</button>
       <button onclick="window.print()" data-vi="🖨️ In / Lưu PDF" data-en="🖨️ Print / Save PDF">🖨️ In / Lưu PDF</button>
       <button class="danger" onclick="deleteCurrentDate()" data-vi="🗑️ Xóa ngày hiện tại" data-en="🗑️ Delete Current Day">🗑️ Xóa ngày hiện tại</button>
       <span class="status-toast" id="statusMsg"></span>
