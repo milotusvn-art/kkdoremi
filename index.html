@@ -341,6 +341,22 @@
       margin-left: auto;
     }
 
+    .cloud-auth {
+      flex: 1 1 100%;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+    }
+
+    .cloud-auth input {
+      min-width: 180px;
+    }
+
+    .cloud-user {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
     footer.credits {
       text-align: center;
       margin-top: 10px;
@@ -476,6 +492,12 @@
       .filter-group input[type="text"] {
         width: 100%;
         min-height: 42px;
+      }
+
+      .cloud-auth input,
+      .cloud-auth button,
+      .cloud-user {
+        width: 100%;
       }
 
       .grid {
@@ -736,6 +758,15 @@
       <div class="filter-group">
         <input type="text" id="searchInput" data-ph-vi="🔎 Tìm từ khóa (KH, hồ sơ...)" data-ph-en="🔎 Search keyword (Customer, loan...)" placeholder="🔎 Tìm từ khóa (KH, hồ sơ...)" onkeyup="filterContent()" />
       </div>
+
+      <div class="filter-group cloud-auth">
+        <input type="email" id="cloudEmail" placeholder="Email cloud" autocomplete="email" />
+        <input type="password" id="cloudPassword" placeholder="Mật khẩu cloud" autocomplete="current-password" />
+        <button type="button" class="btn-sm secondary" onclick="cloudSignIn()" data-vi="Đăng nhập cloud" data-en="Cloud Login">Đăng nhập cloud</button>
+        <button type="button" class="btn-sm light" onclick="cloudSignUp()" data-vi="Tạo tài khoản" data-en="Sign Up">Tạo tài khoản</button>
+        <button type="button" class="btn-sm danger" onclick="cloudSignOut()" data-vi="Đăng xuất" data-en="Sign Out">Đăng xuất</button>
+        <span class="cloud-user" id="cloudUserStatus">Cloud: chưa đăng nhập</span>
+      </div>
     </div>
 
     <form id="dailyForm">
@@ -921,6 +952,8 @@
       <button class="secondary" onclick="exportBackup()" data-vi="📥 Tải Backup (JSON)" data-en="📥 Export Backup (JSON)">📥 Tải Backup (JSON)</button>
       <button class="light" onclick="importBackup()" data-vi="📤 Mở Backup" data-en="📤 Import Backup">📤 Mở Backup</button>
       <button class="danger" onclick="deleteCurrentDate()" data-vi="🗑️ Xóa ngày hiện tại" data-en="🗑️ Delete Current Day">🗑️ Xóa ngày hiện tại</button>
+      <button class="secondary" onclick="syncToCloud()" data-vi="Cloud: Đồng bộ lên" data-en="Cloud: Upload">Cloud: Đồng bộ lên</button>
+      <button class="light" onclick="loadFromCloud()" data-vi="Cloud: Tải xuống" data-en="Cloud: Download">Cloud: Tải xuống</button>
       <span class="status-toast" id="statusMsg"></span>
     </div>
     <footer class="credits">
@@ -946,6 +979,11 @@
   </div>
 
   <script>
+    const SUPABASE_URL = 'https://lhxcwncudnvixpugszgb.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxoeGN3bmN1ZG52aXhwdWdzemdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5MDc2MSwiZXhwIjoyMTAwNDgxNzYxfQ.GfeMYp3n8B5qgxGFBBZqpp4BRBdyQmth-4zeXg5MJgw';
+    const SUPABASE_TABLE = 'kkdoremi_daily_work';
+    const SUPABASE_SESSION_KEY = 'KK_SUPABASE_SESSION';
+
     let currentLang = localStorage.getItem('KK_LANG') || 'vi';
 
     let taskCategories = JSON.parse(localStorage.getItem('KK_TASK_CATEGORIES') || '["Khách hàng", "Hồ sơ", "KPI/Doanh số", "Nội bộ", "Cá nhân"]');
@@ -981,6 +1019,7 @@
 
     let allDailyStore = JSON.parse(localStorage.getItem('KK_DAILY_WORK_DATA') || '{}');
     let currentDate = getTodayString();
+    let cloudSession = getStoredCloudSession();
 
     window.onload = function() {
       document.getElementById('currentDateSelect').value = currentDate;
@@ -988,6 +1027,7 @@
       renderCustomerPills();
       loadDateData(currentDate);
       switchLang(currentLang);
+      updateCloudAuthUI();
     };
 
     function switchLang(lang) {
@@ -1064,6 +1104,123 @@
       }
     }
 
+    function getStoredCloudSession() {
+      try {
+        return JSON.parse(localStorage.getItem(SUPABASE_SESSION_KEY) || 'null');
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function setCloudSession(session) {
+      cloudSession = session;
+      if (session) {
+        localStorage.setItem(SUPABASE_SESSION_KEY, JSON.stringify(session));
+      } else {
+        localStorage.removeItem(SUPABASE_SESSION_KEY);
+      }
+      updateCloudAuthUI();
+    }
+
+    function updateCloudAuthUI() {
+      const status = document.getElementById('cloudUserStatus');
+      if (!status) return;
+      const email = cloudSession && cloudSession.user && cloudSession.user.email;
+      status.textContent = email ? `Cloud: ${email}` : 'Cloud: chưa đăng nhập';
+    }
+
+    function normalizeCloudSession(authData) {
+      return {
+        access_token: authData.access_token,
+        refresh_token: authData.refresh_token,
+        expires_at: authData.expires_at || Math.floor(Date.now() / 1000) + (authData.expires_in || 3600),
+        user: authData.user
+      };
+    }
+
+    async function supabaseAuthRequest(path, body) {
+      const response = await fetch(`${SUPABASE_URL}/auth/v1${path}`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(result.msg || result.error_description || result.message || 'Supabase Auth error');
+      }
+      return result;
+    }
+
+    async function cloudSignUp() {
+      const email = document.getElementById('cloudEmail').value.trim();
+      const password = document.getElementById('cloudPassword').value;
+      if (!email || !password) {
+        alert('Nhập email và mật khẩu cloud trước chú nhé.');
+        return;
+      }
+
+      try {
+        const result = await supabaseAuthRequest('/signup', { email, password });
+        if (result.access_token) {
+          setCloudSession(normalizeCloudSession(result));
+          showStatus('Đã tạo tài khoản và đăng nhập cloud.');
+        } else {
+          showStatus('Đã tạo tài khoản. Nếu Supabase yêu cầu xác nhận email, chú mở email xác nhận rồi đăng nhập lại.');
+        }
+      } catch (error) {
+        console.error('Cloud sign up failed:', error);
+        alert(`Chưa tạo được tài khoản cloud: ${error.message}`);
+      }
+    }
+
+    async function cloudSignIn() {
+      const email = document.getElementById('cloudEmail').value.trim();
+      const password = document.getElementById('cloudPassword').value;
+      if (!email || !password) {
+        alert('Nhập email và mật khẩu cloud trước chú nhé.');
+        return;
+      }
+
+      try {
+        const result = await supabaseAuthRequest('/token?grant_type=password', { email, password });
+        setCloudSession(normalizeCloudSession(result));
+        showStatus('Đã đăng nhập cloud.');
+      } catch (error) {
+        console.error('Cloud sign in failed:', error);
+        alert(`Chưa đăng nhập được cloud: ${error.message}`);
+      }
+    }
+
+    function cloudSignOut() {
+      setCloudSession(null);
+      showStatus('Đã đăng xuất cloud.');
+    }
+
+    async function refreshCloudSessionIfNeeded() {
+      if (!cloudSession || !cloudSession.refresh_token) return null;
+      const expiresSoon = !cloudSession.expires_at || cloudSession.expires_at < Math.floor(Date.now() / 1000) + 60;
+      if (!expiresSoon) return cloudSession;
+
+      const result = await supabaseAuthRequest('/token?grant_type=refresh_token', {
+        refresh_token: cloudSession.refresh_token
+      });
+      setCloudSession(normalizeCloudSession(result));
+      return cloudSession;
+    }
+
+    async function requireCloudSession() {
+      const session = await refreshCloudSessionIfNeeded();
+      if (!session || !session.access_token || !session.user || !session.user.id) {
+        alert('Chú cần đăng nhập cloud trước khi đồng bộ.');
+        throw new Error('Missing cloud session');
+      }
+      return session;
+    }
+
     function loadDateData(dateStr) {
       const data = allDailyStore[dateStr] || defaultData;
       
@@ -1083,8 +1240,99 @@
       showStatus(`${currentLang === 'en' ? 'Loaded data for' : 'Đã tải dữ liệu ngày'} ${dateStr}`);
     }
 
-    function saveData() {
-      const data = {
+    function getCloudPayload() {
+      return {
+        allDailyStore,
+        taskCategories,
+        customerCategories,
+        updatedAt: new Date().toISOString()
+      };
+    }
+
+    function applyCloudPayload(payload) {
+      if (!payload || typeof payload !== 'object') return false;
+      allDailyStore = payload.allDailyStore || {};
+      taskCategories = payload.taskCategories || taskCategories;
+      customerCategories = payload.customerCategories || customerCategories;
+      localStorage.setItem('KK_DAILY_WORK_DATA', JSON.stringify(allDailyStore));
+      localStorage.setItem('KK_TASK_CATEGORIES', JSON.stringify(taskCategories));
+      localStorage.setItem('KK_CUST_CATEGORIES', JSON.stringify(customerCategories));
+      updateHistoryDropdown();
+      renderCustomerPills();
+      loadDateData(currentDate);
+      return true;
+    }
+
+    async function syncToCloud(silent = false) {
+      saveCurrentDateToLocal();
+      try {
+        const session = await requireCloudSession();
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?on_conflict=user_id`, {
+          method: 'POST',
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+            Prefer: 'resolution=merge-duplicates,return=minimal'
+          },
+          body: JSON.stringify({
+            user_id: session.user.id,
+            data: getCloudPayload(),
+            updated_at: new Date().toISOString()
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(await response.text());
+        }
+
+        if (!silent) {
+          showStatus(currentLang === 'en' ? 'Cloud sync completed.' : 'Đã đồng bộ lên cloud.');
+        }
+        return true;
+      } catch (error) {
+        console.error('Supabase sync failed:', error);
+        showStatus(currentLang === 'en' ? 'Cloud sync failed. Check Supabase table setup.' : 'Đồng bộ cloud chưa được. Kiểm tra bảng Supabase.');
+        return false;
+      }
+    }
+
+    async function loadFromCloud() {
+      try {
+        const session = await requireCloudSession();
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?user_id=eq.${session.user.id}&select=data`, {
+          headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${session.access_token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(await response.text());
+        }
+
+        const rows = await response.json();
+        if (!rows.length || !applyCloudPayload(rows[0].data)) {
+          showStatus(currentLang === 'en' ? 'No cloud data found yet.' : 'Chưa có dữ liệu cloud.');
+          return;
+        }
+
+        showStatus(currentLang === 'en' ? 'Loaded data from cloud.' : 'Đã tải dữ liệu từ cloud.');
+      } catch (error) {
+        console.error('Supabase load failed:', error);
+        showStatus(currentLang === 'en' ? 'Could not load cloud data.' : 'Chưa tải được dữ liệu cloud.');
+      }
+    }
+
+    function saveCurrentDateToLocal() {
+      allDailyStore[currentDate] = collectCurrentDateData();
+      localStorage.setItem('KK_DAILY_WORK_DATA', JSON.stringify(allDailyStore));
+      updateHistoryDropdown();
+      updateDateHighlight(currentDate);
+    }
+
+    function collectCurrentDateData() {
+      return {
         mainGoal: document.getElementById('mainGoal').value,
         top3Tasks: document.getElementById('top3Tasks').value,
         kpiFocus: document.getElementById('kpiFocus').value,
@@ -1098,18 +1346,17 @@
         carryOverTasks: document.getElementById('carryOverTasks').value,
         lessonsLearned: document.getElementById('lessonsLearned').value,
         tomorrowTop3: document.getElementById('tomorrowTop3').value,
-        
         tblSchedule: getTableData('tblSchedule', ['startTime', 'endTime', 'group', 'content', 'priority', 'status', 'note']),
         tblTasks: getTableData('tblTasks', ['task', 'group', 'customer', 'deadline', 'priority', 'status', 'nextStep', 'note']),
         tblCustomers: getTableData('tblCustomers', ['name', 'group', 'need', 'product', 'lastContact', 'nextTask', 'followDate', 'priority', 'note']),
         tblLoans: getTableData('tblLoans', ['name', 'product', 'amount', 'status', 'issue', 'contact', 'deadline', 'nextAction', 'note']),
         tblPipeline: getTableData('tblPipeline', ['name', 'source', 'product', 'interest', 'closeRate', 'nextAction', 'recallDate', 'note'])
       };
+    }
 
-      allDailyStore[currentDate] = data;
-      localStorage.setItem('KK_DAILY_WORK_DATA', JSON.stringify(allDailyStore));
-      updateHistoryDropdown();
-      updateDateHighlight(currentDate);
+    function saveData() {
+      saveCurrentDateToLocal();
+      syncToCloud(true);
       showStatus(`✅ ${currentLang === 'en' ? 'Data saved successfully for' : 'Đã lưu dữ liệu thành công cho ngày'} ${currentDate}!`);
     }
 
