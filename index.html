@@ -341,26 +341,58 @@
       margin-left: auto;
     }
 
-    .cloud-auth {
-      flex: 1 1 100%;
-      border-top: 1px solid var(--border);
-      padding-top: 12px;
+    .login-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
     }
 
-    .cloud-auth input {
-      min-width: 180px;
+    .login-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .login-card h2 {
+      margin: 0 0 4px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--primary);
+      font-size: 18px;
+      display: block;
+    }
+
+    .login-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .cloud-auth {
+      display: grid;
+      gap: 10px;
     }
 
     .cloud-fields {
       display: none;
+      grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) auto auto;
       align-items: center;
       gap: 10px;
-      flex-wrap: wrap;
-      width: 100%;
     }
 
     .cloud-auth.is-open .cloud-fields {
-      display: flex;
+      display: grid;
+    }
+
+    .cloud-auth.is-logged-in .cloud-action-buttons,
+    .cloud-auth.is-logged-in .cloud-fields {
+      display: none;
     }
 
     .cloud-action-buttons {
@@ -370,10 +402,22 @@
       flex-wrap: wrap;
     }
 
+    .cloud-session-actions {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .cloud-auth.is-logged-in .cloud-session-actions {
+      display: flex;
+    }
+
     .cloud-user {
       color: var(--muted);
       font-size: 13px;
       font-weight: 700;
+      white-space: nowrap;
     }
 
     footer.credits {
@@ -513,12 +557,26 @@
         min-height: 42px;
       }
 
+      .login-card-header,
+      .cloud-fields,
+      .cloud-action-buttons,
+      .cloud-session-actions,
       .cloud-auth input,
       .cloud-auth button,
-      .cloud-user,
-      .cloud-fields,
-      .cloud-action-buttons {
+      .cloud-user {
         width: 100%;
+      }
+
+      .login-card {
+        border-radius: 12px;
+        padding: 13px;
+      }
+
+      .login-card-header,
+      .cloud-action-buttons,
+      .cloud-fields {
+        display: grid;
+        grid-template-columns: 1fr;
       }
 
       .grid {
@@ -762,6 +820,31 @@
       </select>
     </div>
 
+    <section class="login-card">
+      <div class="login-card-header">
+        <div>
+          <h2>Cloud Login</h2>
+          <p>Du lieu cloud chi hien thi sau khi dang nhap email da duoc duyet. Neu khong dang nhap, ban local chi dung tam thoi; tat trinh duyet la du lieu tam se mat.</p>
+        </div>
+        <span class="cloud-user" id="cloudUserStatus">Cloude: chua dang nhap</span>
+      </div>
+      <div class="cloud-auth">
+        <div class="cloud-action-buttons">
+          <button type="button" class="btn-sm secondary" onclick="showCloudForm('signin')" data-vi="Dang nhap cloud" data-en="Cloud Login">Dang nhap cloud</button>
+          <button type="button" class="btn-sm light" onclick="showCloudForm('signup')" data-vi="Tao tai khoan" data-en="Sign Up">Tao tai khoan</button>
+        </div>
+        <div class="cloud-fields" id="cloudFields">
+          <input type="email" id="cloudEmail" placeholder="Email cloud" autocomplete="email" />
+          <input type="password" id="cloudPassword" placeholder="Mat khau cloud" autocomplete="current-password" />
+          <button type="button" class="btn-sm secondary" id="cloudSubmitBtn" onclick="submitCloudForm()">Tiep tuc</button>
+          <button type="button" class="btn-sm light" onclick="hideCloudForm()" data-vi="An" data-en="Hide">An</button>
+        </div>
+        <div class="cloud-session-actions">
+          <button type="button" class="btn-sm danger" onclick="cloudSignOut()" data-vi="Dang xuat" data-en="Sign Out">Dang xuat</button>
+        </div>
+      </div>
+    </section>
+
     <div class="filter-bar">
       <div class="filter-group">
         <label for="currentDateSelect">📅 <span data-vi="Xem / Nhập dữ liệu ngày:" data-en="View / Input Date:">Xem / Nhập dữ liệu ngày:</span></label>
@@ -780,20 +863,6 @@
         <input type="text" id="searchInput" data-ph-vi="🔎 Tìm từ khóa (KH, hồ sơ...)" data-ph-en="🔎 Search keyword (Customer, loan...)" placeholder="🔎 Tìm từ khóa (KH, hồ sơ...)" onkeyup="filterContent()" />
       </div>
 
-      <div class="filter-group cloud-auth">
-        <div class="cloud-action-buttons">
-          <button type="button" class="btn-sm secondary" onclick="showCloudForm('signin')" data-vi="Đăng nhập cloud" data-en="Cloud Login">Đăng nhập cloud</button>
-          <button type="button" class="btn-sm light" onclick="showCloudForm('signup')" data-vi="Tạo tài khoản" data-en="Sign Up">Tạo tài khoản</button>
-        </div>
-        <div class="cloud-fields" id="cloudFields">
-          <input type="email" id="cloudEmail" placeholder="Email cloud" autocomplete="email" />
-          <input type="password" id="cloudPassword" placeholder="Mật khẩu cloud" autocomplete="current-password" />
-          <button type="button" class="btn-sm secondary" id="cloudSubmitBtn" onclick="submitCloudForm()">Tiếp tục</button>
-          <button type="button" class="btn-sm light" onclick="hideCloudForm()" data-vi="Ẩn" data-en="Hide">Ẩn</button>
-        </div>
-        <button type="button" class="btn-sm danger" onclick="cloudSignOut()" data-vi="Đăng xuất" data-en="Sign Out">Đăng xuất</button>
-        <span class="cloud-user" id="cloudUserStatus">Cloud: chưa đăng nhập</span>
-      </div>
     </div>
 
     <form id="dailyForm">
@@ -1214,9 +1283,13 @@
 
     function updateCloudAuthUI() {
       const status = document.getElementById('cloudUserStatus');
+      const authBox = document.querySelector('.cloud-auth');
       if (!status) return;
       const email = cloudSession && cloudSession.user && cloudSession.user.email;
       status.textContent = email ? `Cloude: ${email}` : 'Cloude: chưa đăng nhập';
+      if (authBox) {
+        authBox.classList.toggle('is-logged-in', Boolean(email));
+      }
     }
 
     function showCloudForm(mode) {
