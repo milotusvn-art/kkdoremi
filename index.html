@@ -783,6 +783,7 @@
       <div class="filter-group cloud-auth">
         <div class="cloud-action-buttons">
           <button type="button" class="btn-sm secondary" onclick="showCloudForm('signin')" data-vi="Đăng nhập cloud" data-en="Cloud Login">Đăng nhập cloud</button>
+          <button type="button" class="btn-sm light" onclick="showCloudForm('signup')" data-vi="Tạo tài khoản" data-en="Sign Up">Tạo tài khoản</button>
         </div>
         <div class="cloud-fields" id="cloudFields">
           <input type="email" id="cloudEmail" placeholder="Email cloud" autocomplete="email" />
@@ -1008,12 +1009,15 @@
     const SUPABASE_URL = 'https://lhxcwncudnvixpugszgb.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxoeGN3bmN1ZG52aXhwdWdzemdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5MDU3NjEsImV4cCI6MjEwMDQ4MTc2MX0.GfeMYp3n8B5qgxGFBBZqpp4BRBdyQmth-4zeXg5MJgw';
     const SUPABASE_TABLE = 'kkdoremi_daily_work';
+    const SUPABASE_ALLOWED_TABLE = 'kkdoremi_allowed_users';
     const SUPABASE_SESSION_KEY = 'KK_SUPABASE_SESSION';
 
     let currentLang = localStorage.getItem('KK_LANG') || 'vi';
 
-    let taskCategories = JSON.parse(localStorage.getItem('KK_TASK_CATEGORIES') || '["Khách hàng", "Hồ sơ", "KPI/Doanh số", "Nội bộ", "Cá nhân"]');
-    let customerCategories = JSON.parse(localStorage.getItem('KK_CUST_CATEGORIES') || '["Khách nóng", "Khách ấm", "Khách lạnh", "Chăm sóc định kỳ"]');
+    const defaultTaskCategories = ["Khách hàng", "Hồ sơ", "KPI/Doanh số", "Nội bộ", "Cá nhân"];
+    const defaultCustomerCategories = ["Khách nóng", "Khách ấm", "Khách lạnh", "Chăm sóc định kỳ"];
+    let taskCategories = JSON.parse(localStorage.getItem('KK_TASK_CATEGORIES') || JSON.stringify(defaultTaskCategories));
+    let customerCategories = JSON.parse(localStorage.getItem('KK_CUST_CATEGORIES') || JSON.stringify(defaultCustomerCategories));
     
     let activeModalType = 'task';
 
@@ -1043,18 +1047,36 @@
       ]
     };
 
-    let allDailyStore = JSON.parse(localStorage.getItem('KK_DAILY_WORK_DATA') || '{}');
+    let allDailyStore = {};
     let currentDate = getTodayString();
     let cloudSession = getStoredCloudSession();
     let cloudFormMode = 'signin';
 
-    window.onload = function() {
+    window.onload = async function() {
       document.getElementById('currentDateSelect').value = currentDate;
+      if (!cloudSession) {
+        clearLocalWorkData();
+        allDailyStore = {};
+        taskCategories = [...defaultTaskCategories];
+        customerCategories = [...defaultCustomerCategories];
+      }
       updateHistoryDropdown();
       renderCustomerPills();
       loadDateData(currentDate);
       switchLang(currentLang);
       updateCloudAuthUI();
+      if (cloudSession) {
+        try {
+          await requireApprovedCloudUser();
+          await loadFromCloud(true);
+          hideCloudForm();
+        } catch (error) {
+          console.error('Stored cloud session is not allowed:', error);
+          setCloudSession(null);
+          clearLocalWorkData();
+          resetVisibleWorkData();
+        }
+      }
     };
 
     function switchLang(lang) {
@@ -1131,6 +1153,47 @@
       }
     }
 
+    function getDataStorageKey() {
+      const userId = cloudSession && cloudSession.user && cloudSession.user.id;
+      return userId ? `KK_DAILY_WORK_DATA_${userId}` : null;
+    }
+
+    function getStoredUserDailyData() {
+      const key = getDataStorageKey();
+      if (!key) return {};
+      try {
+        return JSON.parse(localStorage.getItem(key) || '{}');
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function persistUserDailyData() {
+      const key = getDataStorageKey();
+      if (key) {
+        localStorage.setItem(key, JSON.stringify(allDailyStore));
+      }
+    }
+
+    function clearLocalWorkData() {
+      localStorage.removeItem('KK_DAILY_WORK_DATA');
+      localStorage.removeItem('KK_TASK_CATEGORIES');
+      localStorage.removeItem('KK_CUST_CATEGORIES');
+      Object.keys(localStorage)
+        .filter(key => key.startsWith('KK_DAILY_WORK_DATA_'))
+        .forEach(key => localStorage.removeItem(key));
+    }
+
+    function resetVisibleWorkData() {
+      allDailyStore = {};
+      taskCategories = [...defaultTaskCategories];
+      customerCategories = [...defaultCustomerCategories];
+      updateHistoryDropdown();
+      renderCustomerPills();
+      loadDateData(currentDate);
+      updateDateHighlight(currentDate);
+    }
+
     function getStoredCloudSession() {
       try {
         return JSON.parse(localStorage.getItem(SUPABASE_SESSION_KEY) || 'null');
@@ -1153,7 +1216,7 @@
       const status = document.getElementById('cloudUserStatus');
       if (!status) return;
       const email = cloudSession && cloudSession.user && cloudSession.user.email;
-      status.textContent = email ? `Cloud: ${email}` : 'Cloud: chưa đăng nhập';
+      status.textContent = email ? `Cloude: ${email}` : 'Cloude: chưa đăng nhập';
     }
 
     function showCloudForm(mode) {
@@ -1171,10 +1234,18 @@
     function hideCloudForm() {
       const authBox = document.querySelector('.cloud-auth');
       if (authBox) authBox.classList.remove('is-open');
+      const emailInput = document.getElementById('cloudEmail');
+      const passwordInput = document.getElementById('cloudPassword');
+      if (emailInput) emailInput.value = '';
+      if (passwordInput) passwordInput.value = '';
     }
 
     function submitCloudForm() {
-      cloudSignIn();
+      if (cloudFormMode === 'signup') {
+        cloudSignUp();
+      } else {
+        cloudSignIn();
+      }
     }
 
     function normalizeCloudSession(authData) {
@@ -1204,7 +1275,39 @@
     }
 
     async function cloudSignUp() {
-      alert('Chức năng tạo tài khoản đã được khóa. Chú tạo user trong Supabase rồi dùng Đăng nhập cloud.');
+      const email = document.getElementById('cloudEmail').value.trim();
+      const password = document.getElementById('cloudPassword').value;
+      if (!email || !password) {
+        alert('Nhập email và mật khẩu cloud trước chú nhé.');
+        return;
+      }
+
+      try {
+        const result = await supabaseAuthRequest('/signup', { email, password });
+        if (result.access_token) {
+          setCloudSession(normalizeCloudSession(result));
+          try {
+            await requireApprovedCloudUser();
+            await loadFromCloud(true);
+            hideCloudForm();
+            showStatus('Đã tạo tài khoản, đăng nhập cloud và tự tải dữ liệu cloud.');
+          } catch (approvalError) {
+            console.error('Cloud account pending approval:', approvalError);
+            setCloudSession(null);
+            clearLocalWorkData();
+            resetVisibleWorkData();
+            alert('Tài khoản đã tạo nhưng email này chưa được chú duyệt trên hệ thống.');
+          }
+        } else {
+          showStatus('Đã tạo tài khoản. Chú cần duyệt email này trong Supabase trước khi người dùng đồng bộ dữ liệu.');
+        }
+      } catch (error) {
+        console.error('Cloud sign up failed:', error);
+        setCloudSession(null);
+        clearLocalWorkData();
+        resetVisibleWorkData();
+        alert(`Chưa tạo được tài khoản cloud: ${error.message}`);
+      }
     }
 
     async function cloudSignIn() {
@@ -1218,16 +1321,24 @@
       try {
         const result = await supabaseAuthRequest('/token?grant_type=password', { email, password });
         setCloudSession(normalizeCloudSession(result));
+        await requireApprovedCloudUser();
         await loadFromCloud(true);
+        hideCloudForm();
         showStatus('Đã đăng nhập cloud và tự tải dữ liệu cloud.');
       } catch (error) {
         console.error('Cloud sign in failed:', error);
+        setCloudSession(null);
+        clearLocalWorkData();
+        resetVisibleWorkData();
         alert(`Chưa đăng nhập được cloud: ${error.message}`);
       }
     }
 
     function cloudSignOut() {
       setCloudSession(null);
+      clearLocalWorkData();
+      resetVisibleWorkData();
+      hideCloudForm();
       showStatus('Đã đăng xuất cloud.');
     }
 
@@ -1248,6 +1359,27 @@
       if (!session || !session.access_token || !session.user || !session.user.id) {
         alert('Chú cần đăng nhập cloud trước khi đồng bộ.');
         throw new Error('Missing cloud session');
+      }
+      return session;
+    }
+
+    async function requireApprovedCloudUser() {
+      const session = await requireCloudSession();
+      const email = encodeURIComponent((session.user.email || '').toLowerCase());
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_ALLOWED_TABLE}?email=eq.${email}&approved=eq.true&select=email`, {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+
+      const rows = await response.json();
+      if (!rows.length) {
+        throw new Error('Email này chưa được chú duyệt trên hệ thống.');
       }
       return session;
     }
@@ -1285,9 +1417,11 @@
       allDailyStore = payload.allDailyStore || {};
       taskCategories = payload.taskCategories || taskCategories;
       customerCategories = payload.customerCategories || customerCategories;
-      localStorage.setItem('KK_DAILY_WORK_DATA', JSON.stringify(allDailyStore));
-      localStorage.setItem('KK_TASK_CATEGORIES', JSON.stringify(taskCategories));
-      localStorage.setItem('KK_CUST_CATEGORIES', JSON.stringify(customerCategories));
+      persistUserDailyData();
+      if (cloudSession) {
+        localStorage.setItem('KK_TASK_CATEGORIES', JSON.stringify(taskCategories));
+        localStorage.setItem('KK_CUST_CATEGORIES', JSON.stringify(customerCategories));
+      }
       updateHistoryDropdown();
       renderCustomerPills();
       loadDateData(currentDate);
@@ -1297,7 +1431,7 @@
     async function syncToCloud(silent = false) {
       saveCurrentDateToLocal();
       try {
-        const session = await requireCloudSession();
+        const session = await requireApprovedCloudUser();
         const response = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?on_conflict=user_id`, {
           method: 'POST',
           headers: {
@@ -1330,7 +1464,7 @@
 
     async function loadFromCloud(silent = false) {
       try {
-        const session = await requireCloudSession();
+        const session = await requireApprovedCloudUser();
         const response = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?user_id=eq.${session.user.id}&select=data`, {
           headers: {
             apikey: SUPABASE_ANON_KEY,
@@ -1361,7 +1495,7 @@
 
     function saveCurrentDateToLocal() {
       allDailyStore[currentDate] = collectCurrentDateData();
-      localStorage.setItem('KK_DAILY_WORK_DATA', JSON.stringify(allDailyStore));
+      persistUserDailyData();
       updateHistoryDropdown();
       updateDateHighlight(currentDate);
     }
@@ -1391,6 +1525,10 @@
 
     function saveData() {
       saveCurrentDateToLocal();
+      if (!cloudSession) {
+        showStatus(currentLang === 'en' ? 'Temporary data only. Log in to keep it after closing.' : 'Dữ liệu chỉ lưu tạm. Đăng nhập cloud để giữ sau khi tắt.');
+        return;
+      }
       syncToCloud(true);
       showStatus(`✅ ${currentLang === 'en' ? 'Data saved successfully for' : 'Đã lưu dữ liệu thành công cho ngày'} ${currentDate}!`);
     }
@@ -1403,7 +1541,7 @@
       const confirmMsg = currentLang === 'en' ? `Are you sure you want to delete all data for ${currentDate}?` : `Bạn có chắc muốn xóa toàn bộ dữ liệu ngày ${currentDate}?`;
       if (confirm(confirmMsg)) {
         delete allDailyStore[currentDate];
-        localStorage.setItem('KK_DAILY_WORK_DATA', JSON.stringify(allDailyStore));
+        persistUserDailyData();
         updateHistoryDropdown();
         loadDateData(currentDate);
         showStatus(`❌ ${currentLang === 'en' ? 'Deleted data for' : 'Đã xóa dữ liệu ngày'} ${currentDate}`);
@@ -1597,12 +1735,16 @@
 
       if (activeModalType === 'task') {
         taskCategories = newCategories;
-        localStorage.setItem('KK_TASK_CATEGORIES', JSON.stringify(taskCategories));
+        if (cloudSession) {
+          localStorage.setItem('KK_TASK_CATEGORIES', JSON.stringify(taskCategories));
+        }
         const currentTaskData = getTableData('tblTasks', ['task', 'group', 'customer', 'deadline', 'priority', 'status', 'nextStep', 'note']);
         renderTable('tblTasks', currentTaskData, createTasksRowHTML);
       } else {
         customerCategories = newCategories;
-        localStorage.setItem('KK_CUST_CATEGORIES', JSON.stringify(customerCategories));
+        if (cloudSession) {
+          localStorage.setItem('KK_CUST_CATEGORIES', JSON.stringify(customerCategories));
+        }
         renderCustomerPills();
         const currentCustomerData = getTableData('tblCustomers', ['name', 'group', 'need', 'product', 'lastContact', 'nextTask', 'followDate', 'priority', 'note']);
         renderTable('tblCustomers', currentCustomerData, createCustomersRowHTML);
@@ -1649,7 +1791,7 @@
             const content = JSON.parse(readerEvent.target.result);
             if (confirm(currentLang === 'en' ? 'Overwrite current system with this backup file?' : 'Bạn có muốn đè dữ liệu từ file backup này vào hệ thống?')) {
               allDailyStore = content;
-              localStorage.setItem('KK_DAILY_WORK_DATA', JSON.stringify(allDailyStore));
+              persistUserDailyData();
               updateHistoryDropdown();
               loadDateData(currentDate);
               alert(currentLang === 'en' ? 'Data restored successfully!' : 'Đã phục hồi dữ liệu thành công!');
