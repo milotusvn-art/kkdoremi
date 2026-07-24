@@ -408,11 +408,295 @@
 
     @media (max-width: 860px) {
       .span-4, .span-6, .span-8, .span-12 { grid-column: span 12; }
-      table { font-size: 12px; }
-      th, td { padding: 6px; }
       .filter-bar { flex-direction: column; align-items: stretch; }
       h2 { flex-direction: column; align-items: flex-start; }
       .header-buttons, h2 > button { margin-left: 0; }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        background: #eef3f8;
+        font-size: 15px;
+      }
+
+      .container {
+        width: 100%;
+        padding: 12px 10px 108px;
+      }
+
+      header {
+        border-radius: 12px;
+        padding: 18px 16px;
+        margin-bottom: 10px;
+      }
+
+      header h1 {
+        font-size: 21px;
+        line-height: 1.25;
+      }
+
+      header p {
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .top-lang-bar {
+        justify-content: stretch;
+        margin-bottom: 10px;
+        padding-right: 0;
+      }
+
+      .lang-select-sm {
+        flex: 1;
+        min-height: 36px;
+      }
+
+      .filter-bar {
+        border-width: 1px;
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 14px;
+        gap: 10px;
+      }
+
+      .filter-group {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .filter-group label {
+        white-space: normal;
+        font-size: 14px;
+      }
+
+      .filter-group input[type="date"],
+      .filter-group select,
+      .filter-group input[type="text"] {
+        width: 100%;
+        min-height: 42px;
+      }
+
+      .grid {
+        display: block;
+      }
+
+      .card {
+        border-radius: 12px;
+        padding: 13px;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+      }
+
+      h2 {
+        font-size: 16px;
+        line-height: 1.35;
+        padding: 9px 10px;
+        border-radius: 8px;
+        gap: 8px;
+      }
+
+      h3 {
+        font-size: 15px;
+      }
+
+      label {
+        font-size: 14px;
+      }
+
+      input,
+      textarea,
+      select {
+        min-height: 42px;
+        font-size: 16px;
+        border-radius: 9px;
+      }
+
+      textarea {
+        min-height: 86px;
+      }
+
+      .header-buttons {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .header-buttons button,
+      h2 > button {
+        width: 100%;
+        min-height: 38px;
+      }
+
+      table,
+      thead,
+      tbody,
+      tr,
+      th,
+      td {
+        display: block;
+        width: 100%;
+      }
+
+      table {
+        background: transparent;
+        border-radius: 0;
+      }
+
+      thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+      }
+
+      tbody tr {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 10px;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+      }
+
+      th,
+      td {
+        border: 0;
+        padding: 0;
+      }
+
+      td {
+        margin-bottom: 10px;
+      }
+
+      td:last-child {
+        margin-bottom: 0;
+      }
+
+      td::before {
+        content: "";
+        display: block;
+        margin-bottom: 4px;
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--primary);
+      }
+
+      td input,
+      td select,
+      td textarea {
+        width: 100%;
+        border: 1px solid var(--border);
+        background: var(--soft);
+        padding: 8px 9px;
+        border-radius: 9px;
+      }
+
+      td textarea {
+        min-height: 76px;
+      }
+
+      .time-picker-range {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 6px;
+      }
+
+      .time-picker-range input[type="time"] {
+        width: 100%;
+        min-height: 40px;
+        font-size: 16px;
+      }
+
+      .btn-row-action {
+        width: 100%;
+        height: 38px;
+        border-radius: 9px;
+      }
+
+      #tblSchedule td:nth-of-type(1)::before { content: "Thoi gian"; }
+      #tblSchedule td:nth-of-type(2)::before { content: "Nhom viec"; }
+      #tblSchedule td:nth-of-type(3)::before { content: "Noi dung"; }
+      #tblSchedule td:nth-of-type(4)::before { content: "Uu tien"; }
+      #tblSchedule td:nth-of-type(5)::before { content: "Trang thai"; }
+      #tblSchedule td:nth-of-type(6)::before { content: "Ghi chu"; }
+
+      #tblTasks td:nth-of-type(1)::before { content: "Viec can lam"; }
+      #tblTasks td:nth-of-type(2)::before { content: "Nhom"; }
+      #tblTasks td:nth-of-type(3)::before { content: "Khach hang"; }
+      #tblTasks td:nth-of-type(4)::before { content: "Han"; }
+      #tblTasks td:nth-of-type(5)::before { content: "Uu tien"; }
+      #tblTasks td:nth-of-type(6)::before { content: "Trang thai"; }
+      #tblTasks td:nth-of-type(7)::before { content: "Buoc tiep"; }
+      #tblTasks td:nth-of-type(8)::before { content: "Ghi chu"; }
+
+      #tblCustomers td:nth-of-type(1)::before { content: "Ten KH"; }
+      #tblCustomers td:nth-of-type(2)::before { content: "Nhom KH"; }
+      #tblCustomers td:nth-of-type(3)::before { content: "Nhu cau"; }
+      #tblCustomers td:nth-of-type(4)::before { content: "San pham"; }
+      #tblCustomers td:nth-of-type(5)::before { content: "Lien he gan nhat"; }
+      #tblCustomers td:nth-of-type(6)::before { content: "Viec tiep theo"; }
+      #tblCustomers td:nth-of-type(7)::before { content: "Ngay follow"; }
+      #tblCustomers td:nth-of-type(8)::before { content: "Uu tien"; }
+      #tblCustomers td:nth-of-type(9)::before { content: "Ghi chu"; }
+
+      #tblLoans td:nth-of-type(1)::before { content: "Khach hang"; }
+      #tblLoans td:nth-of-type(2)::before { content: "San pham"; }
+      #tblLoans td:nth-of-type(3)::before { content: "So tien"; }
+      #tblLoans td:nth-of-type(4)::before { content: "Trang thai"; }
+      #tblLoans td:nth-of-type(5)::before { content: "Van de"; }
+      #tblLoans td:nth-of-type(6)::before { content: "Lien he"; }
+      #tblLoans td:nth-of-type(7)::before { content: "Han"; }
+      #tblLoans td:nth-of-type(8)::before { content: "Hanh dong tiep"; }
+      #tblLoans td:nth-of-type(9)::before { content: "Ghi chu"; }
+
+      #tblPipeline td:nth-of-type(1)::before { content: "Khach hang"; }
+      #tblPipeline td:nth-of-type(2)::before { content: "Nguon"; }
+      #tblPipeline td:nth-of-type(3)::before { content: "San pham"; }
+      #tblPipeline td:nth-of-type(4)::before { content: "Quan tam"; }
+      #tblPipeline td:nth-of-type(5)::before { content: "Kha nang chot"; }
+      #tblPipeline td:nth-of-type(6)::before { content: "Hanh dong tiep"; }
+      #tblPipeline td:nth-of-type(7)::before { content: "Ngay goi lai"; }
+      #tblPipeline td:nth-of-type(8)::before { content: "Ghi chu"; }
+
+      .actions {
+        padding: 10px 0 max(10px, env(safe-area-inset-bottom));
+      }
+
+      .button-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding: 0 10px;
+      }
+
+      .button-row button {
+        width: 100%;
+        min-height: 42px;
+        padding: 9px 8px;
+        font-size: 13px;
+      }
+
+      .status-toast {
+        grid-column: 1 / -1;
+        margin-left: 0;
+        text-align: center;
+      }
+
+      .modal-overlay {
+        align-items: flex-end;
+        padding: 10px;
+      }
+
+      .modal {
+        max-width: none;
+        max-height: 88vh;
+        overflow-y: auto;
+        border-radius: 14px;
+        padding: 16px;
+      }
     }
   </style>
 </head>
