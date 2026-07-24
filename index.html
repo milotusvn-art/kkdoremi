@@ -783,7 +783,6 @@
       <div class="filter-group cloud-auth">
         <div class="cloud-action-buttons">
           <button type="button" class="btn-sm secondary" onclick="showCloudForm('signin')" data-vi="Đăng nhập cloud" data-en="Cloud Login">Đăng nhập cloud</button>
-          <button type="button" class="btn-sm light" onclick="showCloudForm('signup')" data-vi="Tạo tài khoản" data-en="Sign Up">Tạo tài khoản</button>
         </div>
         <div class="cloud-fields" id="cloudFields">
           <input type="email" id="cloudEmail" placeholder="Email cloud" autocomplete="email" />
@@ -1175,11 +1174,7 @@
     }
 
     function submitCloudForm() {
-      if (cloudFormMode === 'signup') {
-        cloudSignUp();
-      } else {
-        cloudSignIn();
-      }
+      cloudSignIn();
     }
 
     function normalizeCloudSession(authData) {
@@ -1209,26 +1204,7 @@
     }
 
     async function cloudSignUp() {
-      const email = document.getElementById('cloudEmail').value.trim();
-      const password = document.getElementById('cloudPassword').value;
-      if (!email || !password) {
-        alert('Nhập email và mật khẩu cloud trước chú nhé.');
-        return;
-      }
-
-      try {
-        const result = await supabaseAuthRequest('/signup', { email, password });
-        if (result.access_token) {
-          setCloudSession(normalizeCloudSession(result));
-          await loadFromCloud(true);
-          showStatus('Đã tạo tài khoản, đăng nhập cloud và tự tải dữ liệu cloud.');
-        } else {
-          showStatus('Đã tạo tài khoản. Nếu Supabase yêu cầu xác nhận email, chú mở email xác nhận rồi đăng nhập lại.');
-        }
-      } catch (error) {
-        console.error('Cloud sign up failed:', error);
-        alert(`Chưa tạo được tài khoản cloud: ${error.message}`);
-      }
+      alert('Chức năng tạo tài khoản đã được khóa. Chú tạo user trong Supabase rồi dùng Đăng nhập cloud.');
     }
 
     async function cloudSignIn() {
