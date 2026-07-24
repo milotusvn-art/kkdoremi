@@ -1220,7 +1220,8 @@
         const result = await supabaseAuthRequest('/signup', { email, password });
         if (result.access_token) {
           setCloudSession(normalizeCloudSession(result));
-          showStatus('Đã tạo tài khoản và đăng nhập cloud.');
+          await loadFromCloud(true);
+          showStatus('Đã tạo tài khoản, đăng nhập cloud và tự tải dữ liệu cloud.');
         } else {
           showStatus('Đã tạo tài khoản. Nếu Supabase yêu cầu xác nhận email, chú mở email xác nhận rồi đăng nhập lại.');
         }
@@ -1241,7 +1242,8 @@
       try {
         const result = await supabaseAuthRequest('/token?grant_type=password', { email, password });
         setCloudSession(normalizeCloudSession(result));
-        showStatus('Đã đăng nhập cloud.');
+        await loadFromCloud(true);
+        showStatus('Đã đăng nhập cloud và tự tải dữ liệu cloud.');
       } catch (error) {
         console.error('Cloud sign in failed:', error);
         alert(`Chưa đăng nhập được cloud: ${error.message}`);
@@ -1350,7 +1352,7 @@
       }
     }
 
-    async function loadFromCloud() {
+    async function loadFromCloud(silent = false) {
       try {
         const session = await requireCloudSession();
         const response = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?user_id=eq.${session.user.id}&select=data`, {
@@ -1366,11 +1368,15 @@
 
         const rows = await response.json();
         if (!rows.length || !applyCloudPayload(rows[0].data)) {
-          showStatus(currentLang === 'en' ? 'No cloud data found yet.' : 'Chưa có dữ liệu cloud.');
+          if (!silent) {
+            showStatus(currentLang === 'en' ? 'No cloud data found yet.' : 'Chưa có dữ liệu cloud.');
+          }
           return;
         }
 
-        showStatus(currentLang === 'en' ? 'Loaded data from cloud.' : 'Đã tải dữ liệu từ cloud.');
+        if (!silent) {
+          showStatus(currentLang === 'en' ? 'Loaded data from cloud.' : 'Đã tải dữ liệu từ cloud.');
+        }
       } catch (error) {
         console.error('Supabase load failed:', error);
         showStatus(currentLang === 'en' ? 'Could not load cloud data.' : 'Chưa tải được dữ liệu cloud.');
