@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Executive Daily Work Management – Kim Khánh</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --primary: #1f4e79;
+      --primary-light: #e8f1fb;
+      --accent: #0f766e;
+      --danger: #b91c1c;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #d8dee9;
+      --soft: #f9fafb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 18px 40px;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1f4e79, #0f766e);
+      color: white;
+      border-radius: 18px;
+      padding: 28px;
+      margin-bottom: 12px;
+      box-shadow: 0 10px 24px rgba(31, 78, 121, 0.2);
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      font-family: inherit;
+    }
+
+    header p {
+      margin: 0;
+      opacity: 0.92;
+    }
+
+    /* Thanh chọn ngôn ngữ góc trên bên phải tiêu đề */
+    .top-lang-bar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 16px;
+      padding-right: 4px;
+    }
+
+    .lang-label-sm {
+      font-size: 12px !important;
+      font-weight: 600 !important;
+      color: var(--muted) !important;
+      margin: 0 !important;
+    }
+
+    .lang-select-sm {
+      font-size: 12px !important;
+      padding: 4px 8px !important;
+      border-radius: 8px !important;
+      border: 1px solid var(--border) !important;
+      background: #fff !important;
+      font-weight: bold !important;
+      cursor: pointer;
+      width: auto !important;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+    }
+
+    .filter-bar {
+      background: #ffffff;
+      border: 2px solid var(--primary);
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 4px 12px rgba(31, 78, 121, 0.1);
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-group label {
+      margin: 0;
+      font-size: 15px;
+      white-space: nowrap;
+    }
+
+    .filter-group input[type="date"], .filter-group select, .filter-group input[type="text"] {
+      width: auto;
+      padding: 8px 12px;
+      font-weight: bold;
+      transition: all 0.25s ease;
+    }
+
+    input[type="date"].has-data {
+      background-color: #d1fae5 !important;
+      border: 2px solid #059669 !important;
+      color: #065f46 !important;
+      font-weight: bold !important;
+      box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+      margin-bottom: 16px;
+    }
+
+    .span-4 { grid-column: span 4; }
+    .span-6 { grid-column: span 6; }
+    .span-8 { grid-column: span 8; }
+    .span-12 { grid-column: span 12; }
+
+    /* TIÊU ĐỀ H2 - ĐÃ SỬA LỖI FONT & TỐI ƯU HIỂN THỊ TIẾNG VIỆT */
+    h2 {
+      margin: 0 0 16px;
+      color: var(--primary);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 19px;
+      font-weight: 700;
+      line-height: 1.4;
+      background: linear-gradient(90deg, var(--primary-light) 0%, rgba(232, 241, 251, 0.15) 100%);
+      border-left: 6px solid var(--accent);
+      padding: 10px 14px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      flex-wrap: wrap;
+    }
+
+    .header-buttons {
+      display: flex;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    h2 > button {
+      margin-left: auto;
+    }
+
+    h3 {
+      margin: 16px 0 8px;
+      font-size: 16px;
+      color: var(--primary);
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin: 10px 0 5px;
+      color: #374151;
+      text-align: left;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 10px;
+      font-size: 14px;
+      background: #fff;
+      color: var(--text);
+      font-family: inherit;
+    }
+
+    textarea { min-height: 74px; resize: vertical; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      overflow: hidden;
+      border-radius: 12px;
+      font-size: 14px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 9px;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--primary-light);
+      color: #17324d;
+      text-align: left;
+      font-weight: 700;
+    }
+
+    td input, td select, td textarea {
+      border: 0;
+      padding: 4px;
+      border-radius: 6px;
+      background: transparent;
+    }
+
+    td textarea { min-height: 42px; }
+
+    .time-picker-range {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .time-picker-range input[type="time"] {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 2px 4px;
+      font-size: 13px;
+    }
+
+    .btn-row-action {
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #fee2e2;
+      color: var(--danger);
+      border: 1px solid #fca5a5;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .btn-row-action:hover {
+      background: var(--danger);
+      color: white;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 8px;
+      text-align: left;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--primary-light);
+      color: var(--primary);
+      margin: 2px;
+    }
+
+    .rules {
+      text-align: left;
+      padding-left: 20px;
+    }
+
+    .rules li { margin-bottom: 8px; }
+
+    .actions {
+      position: sticky;
+      bottom: 0;
+      background: rgba(245, 247, 251, 0.95);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--border);
+      padding: 12px 0 8px;
+      margin-top: 20px;
+      z-index: 1000;
+    }
+
+    .button-row {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 0 18px;
+      align-items: center;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 700;
+      color: white;
+      background: var(--primary);
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    button:hover { opacity: 0.9; }
+
+    button.success { background: #059669; }
+    button.secondary { background: var(--accent); }
+    button.light { background: #4b5563; }
+    button.danger { background: var(--danger); }
+    button.btn-sm { padding: 6px 10px; font-size: 12px; }
+
+    .status-toast {
+      font-size: 13px;
+      font-weight: bold;
+      color: #059669;
+      margin-left: auto;
+    }
+
+    footer.credits {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    footer.credits span {
+      display: inline-block;
+      transition: transform 0.2s;
+    }
+
+    footer.credits:hover span {
+      transform: scale(1.05);
+    }
+
+    /* Modal Quản lý danh mục */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    .modal h3 { margin-top: 0; }
+
+    .category-list {
+      list-style: none;
+      padding: 0;
+      margin: 16px 0;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+
+    .category-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .category-item input { flex: 1; }
+
+    @media print {
+      body { background: #fff; }
+      .actions, .filter-bar, .top-lang-bar, .btn-row-action, .btn-sm, .modal-overlay { display: none !important; }
+      .container { max-width: none; padding: 0; }
+      header, .card { box-shadow: none; break-inside: avoid; }
+      input, textarea, select { border: 0; }
+    }
+
+    @media (max-width: 860px) {
+      .span-4, .span-6, .span-8, .span-12 { grid-column: span 12; }
+      table { font-size: 12px; }
+      th, td { padding: 6px; }
+      .filter-bar { flex-direction: column; align-items: stretch; }
+      h2 { flex-direction: column; align-items: flex-start; }
+      .header-buttons, h2 > button { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Executive Daily Work Management – Kim Khánh</h1>
+      <p data-vi="Hệ thống quản lý điều hành hằng ngày: theo dõi khách hàng, hồ sơ, mục tiêu KPI, lịch trình làm việc và lưu vết nối tiếp theo thời gian." 
+         data-en="Daily operations management system: track customers, records, KPI targets, schedules, and sequential logging over time">
+        Hệ thống quản lý điều hành hằng ngày: theo dõi khách hàng, hồ sơ, mục tiêu KPI, lịch trình làm việc và lưu vết nối tiếp theo thời gian.
+      </p>
+    </header>
+
+    <!-- THANH CHỌN NGÔN NGỮ THU NHỎ DƯỚI HEADER GÓC PHẢI -->
+    <div class="top-lang-bar">
+      <label for="langSelect" class="lang-label-sm">🌐 <span data-vi="Ngôn ngữ" data-en="Language">Ngôn ngữ</span>:</label>
+      <select id="langSelect" class="lang-select-sm" onchange="switchLang(this.value)">
+        <option value="vi">🇻🇳 Tiếng Việt</option>
+        <option value="en">🇬🇧 English</option>
+      </select>
+    </div>
+
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label for="currentDateSelect">📅 <span data-vi="Xem / Nhập dữ liệu ngày:" data-en="View / Input Date:">Xem / Nhập dữ liệu ngày:</span></label>
+        <input type="date" id="currentDateSelect" onchange="changeDate()" />
+        <button class="btn-sm secondary" onclick="goToToday()" data-vi="Hôm nay" data-en="Today">Hôm nay</button>
+      </div>
+
+      <div class="filter-group">
+        <label for="historyDates">📂 <span data-vi="Các ngày đã lưu:" data-en="Saved Dates:">Các ngày đã lưu:</span></label>
+        <select id="historyDates" onchange="loadSelectedHistoryDate()">
+          <option value="" data-vi="-- Chọn ngày đã lưu --" data-en="-- Select saved date --">-- Chọn ngày đã lưu --</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <input type="text" id="searchInput" data-ph-vi="🔎 Tìm từ khóa (KH, hồ sơ...)" data-ph-en="🔎 Search keyword (Customer, loan...)" placeholder="🔎 Tìm từ khóa (KH, hồ sơ...)" onkeyup="filterContent()" />
+      </div>
+    </div>
+
+    <form id="dailyForm">
+      <section class="grid">
+        <div class="card span-8">
+          <h2>1. <span data-vi="Dashboard hôm nay" data-en="Today's Dashboard">Dashboard hôm nay</span></h2>
+          <label data-vi="Mục tiêu chính trong ngày" data-en="Main Goals for Today">Mục tiêu chính trong ngày</label>
+          <textarea id="mainGoal" data-ph-vi="Ví dụ: hoàn tất 2 hồ sơ, gọi 15 khách, tạo 3 cuộc hẹn..." data-ph-en="e.g. Complete 2 loan files, call 15 clients, set 3 appointments..." placeholder="Ví dụ: hoàn tất 2 hồ sơ, gọi 15 khách, tạo 3 cuộc hẹn..."></textarea>
+          <label data-vi="3 việc quan trọng nhất" data-en="Top 3 Critical Tasks">3 việc quan trọng nhất</label>
+          <textarea id="top3Tasks" placeholder="1.&#10;2.&#10;3."></textarea>
+        </div>
+
+        <div class="card span-4">
+          <h2><span data-vi="KPI & rủi ro" data-en="KPIs & Risks">KPI & rủi ro</span></h2>
+          <label data-vi="KPI cần chú ý" data-en="Focus KPIs">KPI cần chú ý</label>
+          <textarea id="kpiFocus" data-ph-vi="Tiền gửi / vay / thẻ / bảo hiểm / số cuộc hẹn..." data-ph-en="Deposits / Loans / Cards / Insurance / Appointments..." placeholder="Tiền gửi / vay / thẻ / bảo hiểm / số cuộc hẹn..."></textarea>
+          <label data-vi="Rủi ro hoặc vướng mắc lớn nhất" data-en="Top Risks & Bottlenecks">Rủi ro hoặc vướng mắc lớn nhất</label>
+          <textarea id="topRisks" data-ph-vi="Hồ sơ kẹt, khách chưa phản hồi, thiếu giấy tờ..." data-ph-en="Delayed applications, unresponsive clients, missing docs..." placeholder="Hồ sơ kẹt, khách chưa phản hồi, thiếu giấy tờ..."></textarea>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>
+          <span>2. <span data-vi="Lịch làm việc trong ngày" data-en="Daily Schedule">Lịch làm việc trong ngày</span></span>
+          <button type="button" class="btn-sm secondary" onclick="addRow('tblSchedule')" data-vi="+ Thêm dòng" data-en="+ Add Row">+ Thêm dòng</button>
+        </h2>
+        <table id="tblSchedule">
+          <thead>
+            <tr>
+              <th style="width: 170px;" data-vi="Khung giờ" data-en="Time Slot">Khung giờ</th>
+              <th style="width: 130px;" data-vi="Nhóm việc" data-en="Category">Nhóm việc</th>
+              <th data-vi="Nội dung cụ thể" data-en="Specific Detail">Nội dung cụ thể</th>
+              <th style="width: 110px;" data-vi="Mức ưu tiên" data-en="Priority">Mức ưu tiên</th>
+              <th style="width: 120px;" data-vi="Trạng thái" data-en="Status">Trạng thái</th>
+              <th data-vi="Ghi chú" data-en="Notes">Ghi chú</th>
+              <th style="width: 40px;"></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <section class="card">
+        <h2>
+          <span>3. <span data-vi="Danh sách việc cần làm" data-en="To-Do List">Danh sách việc cần làm</span></span>
+          <div class="header-buttons">
+            <button type="button" class="btn-sm light" onclick="openCategoryModal('task')" data-vi="⚙️ Quản lý Nhóm việc" data-en="⚙️ Manage Categories">⚙️ Quản lý Nhóm việc</button>
+            <button type="button" class="btn-sm secondary" onclick="addRow('tblTasks')" data-vi="+ Thêm dòng" data-en="+ Add Row">+ Thêm dòng</button>
+          </div>
+        </h2>
+        <table id="tblTasks">
+          <thead>
+            <tr>
+              <th data-vi="Việc cần làm" data-en="Task Name">Việc cần làm</th>
+              <th style="width: 130px;" data-vi="Nhóm việc" data-en="Category">Nhóm việc</th>
+              <th data-vi="Khách hàng" data-en="Customer">Khách hàng</th>
+              <th style="width: 120px;" data-vi="Deadline" data-en="Deadline">Deadline</th>
+              <th style="width: 100px;" data-vi="Ưu tiên" data-en="Priority">Ưu tiên</th>
+              <th style="width: 120px;" data-vi="Trạng thái" data-en="Status">Trạng thái</th>
+              <th data-vi="Bước tiếp theo" data-en="Next Step">Bước tiếp theo</th>
+              <th data-vi="Ghi chú" data-en="Notes">Ghi chú</th>
+              <th style="width: 40px;"></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <section class="card">
+        <h2>
+          <span>4. <span data-vi="Quản lý khách hàng cần chăm sóc" data-en="Customer Care Management">Quản lý khách hàng cần chăm sóc</span></span>
+          <div class="header-buttons">
+            <button type="button" class="btn-sm light" onclick="openCategoryModal('customer')" data-vi="⚙️ Quản lý Nhóm khách" data-en="⚙️ Manage Groups">⚙️ Quản lý Nhóm khách</button>
+            <button type="button" class="btn-sm secondary" onclick="addRow('tblCustomers')" data-vi="+ Thêm dòng" data-en="+ Add Row">+ Thêm dòng</button>
+          </div>
+        </h2>
+        <p class="hint" id="customerPillList"></p>
+        <table id="tblCustomers">
+          <thead>
+            <tr>
+              <th data-vi="Tên khách hàng" data-en="Customer Name">Tên khách hàng</th>
+              <th style="width: 140px;" data-vi="Nhóm khách" data-en="Customer Group">Nhóm khách</th>
+              <th data-vi="Nhu cầu chính" data-en="Primary Need">Nhu cầu chính</th>
+              <th data-vi="Sản phẩm" data-en="Product">Sản phẩm</th>
+              <th style="width: 110px;" data-vi="Liên hệ gần nhất" data-en="Last Contact">Liên hệ gần nhất</th>
+              <th data-vi="Việc tiếp theo" data-en="Next Task">Việc tiếp theo</th>
+              <th style="width: 110px;" data-vi="Ngày follow-up" data-en="Follow-up Date">Ngày follow-up</th>
+              <th data-vi="Ưu tiên" data-en="Priority">Ưu tiên</th>
+              <th data-vi="Ghi chú" data-en="Notes">Ghi chú</th>
+              <th style="width: 40px;"></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <section class="card">
+        <h2>
+          <span>5. <span data-vi="Theo dõi hồ sơ đang xử lý" data-en="Pending Records & Loan Tracking">Theo dõi hồ sơ đang xử lý</span></span>
+          <button type="button" class="btn-sm secondary" onclick="addRow('tblLoans')" data-vi="+ Thêm dòng" data-en="+ Add Row">+ Thêm dòng</button>
+        </h2>
+        <table id="tblLoans">
+          <thead>
+            <tr>
+              <th data-vi="Tên khách hàng" data-en="Customer Name">Tên khách hàng</th>
+              <th data-vi="Sản phẩm/Hồ sơ" data-en="Product/Record">Sản phẩm/Hồ sơ</th>
+              <th style="width: 100px;" data-vi="Giá trị (Trđ)" data-en="Amount (M VND)">Giá trị (Trđ)</th>
+              <th data-vi="Trạng thái" data-en="Status">Trạng thái</th>
+              <th data-vi="Đang vướng ở đâu" data-en="Bottleneck">Đang vướng ở đâu</th>
+              <th data-vi="Nội bộ/Đối tác" data-en="Internal/Partner">Nội bộ/Đối tác</th>
+              <th style="width: 110px;" data-vi="Deadline" data-en="Deadline">Deadline</th>
+              <th data-vi="Hành động tiếp" data-en="Next Action">Hành động tiếp</th>
+              <th data-vi="Ghi chú" data-en="Notes">Ghi chú</th>
+              <th style="width: 40px;"></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <section class="card">
+        <h2>
+          <span>6. <span data-vi="Pipeline khách hàng tiềm năng" data-en="Potential Customer Pipeline">Pipeline khách hàng tiềm năng</span></span>
+          <button type="button" class="btn-sm secondary" onclick="addRow('tblPipeline')" data-vi="+ Thêm dòng" data-en="+ Add Row">+ Thêm dòng</button>
+        </h2>
+        <table id="tblPipeline">
+          <thead>
+            <tr>
+              <th data-vi="Tên khách hàng" data-en="Customer Name">Tên khách hàng</th>
+              <th data-vi="Nguồn khách" data-en="Lead Source">Nguồn khách</th>
+              <th data-vi="Sản phẩm quan tâm" data-en="Product Interest">Sản phẩm quan tâm</th>
+              <th data-vi="Mức độ quan tâm" data-en="Interest Level">Mức độ quan tâm</th>
+              <th data-vi="Khả năng chốt" data-en="Close Chance">Khả năng chốt</th>
+              <th data-vi="Hành động tiếp" data-en="Next Action">Hành động tiếp</th>
+              <th style="width: 110px;" data-vi="Ngày LH lại" data-en="Re-contact Date">Ngày LH lại</th>
+              <th data-vi="Ghi chú" data-en="Notes">Ghi chú</th>
+              <th style="width: 40px;"></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <section class="grid">
+        <div class="card span-8">
+          <h2>7. <span data-vi="Tổng kết cuối ngày" data-en="End of Day Summary">Tổng kết cuối ngày</span></h2>
+          <div class="grid">
+            <div class="span-4"><label data-vi="Số khách đã liên hệ" data-en="Contacted Clients">Số khách đã liên hệ</label><input type="number" id="statContacted" /></div>
+            <div class="span-4"><label data-vi="Số khách phản hồi" data-en="Responded Clients">Số khách phản hồi</label><input type="number" id="statResponded" /></div>
+            <div class="span-4"><label data-vi="Số cuộc hẹn tạo được" data-en="Appointments Set">Số cuộc hẹn tạo được</label><input type="number" id="statAppointments" /></div>
+            <div class="span-4"><label data-vi="Số hồ sơ tiến triển" data-en="Progressed Loans">Số hồ sơ tiến triển</label><input type="number" id="statProgressLoans" /></div>
+            <div class="span-4"><label data-vi="Số hồ sơ bị kẹt" data-en="Stuck Loans">Số hồ sơ bị kẹt</label><input type="number" id="statStuckLoans" /></div>
+            <div class="span-4"><label data-vi="Doanh số/KPI hôm nay" data-en="Today's Sales / KPI">Doanh số/KPI hôm nay</label><input id="statKpiResult" /></div>
+          </div>
+          <label data-vi="Việc chưa xong chuyển sang ngày mai" data-en="Carry-over Tasks to Tomorrow">Việc chưa xong chuyển sang ngày mai</label>
+          <textarea id="carryOverTasks" placeholder="1.&#10;2.&#10;3."></textarea>
+          <label data-vi="Bài học/tình huống cần rút kinh nghiệm" data-en="Lessons Learned & Key Takeaways">Bài học/tình huống cần rút kinh nghiệm</label>
+          <textarea id="lessonsLearned"></textarea>
+          <label data-vi="3 việc ưu tiên ngày mai" data-en="Top 3 Priorities for Tomorrow">3 việc ưu tiên ngày mai</label>
+          <textarea id="tomorrowTop3" placeholder="1.&#10;2.&#10;3."></textarea>
+        </div>
+
+        <div class="card span-4">
+          <h2>8. <span data-vi="Quy tắc ưu tiên nhanh" data-en="Quick Priority Rules">Quy tắc ưu tiên nhanh</span></h2>
+          <ol class="rules">
+            <li data-vi="Khách hàng/VIP đang chờ phản hồi → ưu tiên cao." data-en="Clients/VIPs waiting for response → High Priority.">Khách hàng/VIP đang chờ phản hồi → ưu tiên cao.</li>
+            <li data-vi="Hồ sơ có deadline hôm nay → xử lý trong ngày." data-en="Records due today → Process today.">Hồ sơ có deadline hôm nay → xử lý trong ngày.</li>
+            <li data-vi="Việc ảnh hưởng KPI/doanh số → làm trước việc hành chính." data-en="Tasks affecting KPIs/Sales → Prioritize over admin.">Việc ảnh hưởng KPI/doanh số → làm trước việc hành chính.</li>
+            <li data-vi="Việc có thể giao/nhờ nội bộ → chuyển sớm, không ôm quá lâu." data-en="Delegatable tasks → Pass early, don't hold too long.">Việc có thể giao/nhờ nội bộ → chuyển sớm, không ôm quá lâu.</li>
+            <li data-vi="Cuối ngày bắt buộc cập nhật việc tồn và kế hoạch ngày mai." data-en="End of day → Update pending tasks & tomorrow's plan.">Cuối ngày bắt buộc cập nhật việc tồn và kế hoạch ngày mai.</li>
+          </ol>
+          <h3><span data-vi="Gợi ý dùng an toàn" data-en="Security Notice">Gợi ý dùng an toàn</span></h3>
+          <p class="hint" data-vi="Không nhập CIF, số tài khoản, CCCD, số thẻ, mật khẩu, sao kê hoặc dữ liệu nhạy cảm chưa được ẩn danh." data-en="Do not input CIF, account numbers, ID numbers, card numbers, passwords, bank statements, or unanonymized sensitive data.">Không nhập CIF, số tài khoản, CCCD, số thẻ, mật khẩu, sao kê hoặc dữ liệu nhạy cảm chưa được ẩn danh.</p>
+        </div>
+      </section>
+    </form>
+  </div>
+
+  <div class="actions">
+    <div class="button-row">
+      <button class="success" onclick="saveData()" data-vi="💾 Lưu dữ liệu ngày này" data-en="💾 Save Today's Data">💾 Lưu dữ liệu ngày này</button>
+      <button onclick="window.print()" data-vi="🖨️ In / Lưu PDF" data-en="🖨️ Print / Save PDF">🖨️ In / Lưu PDF</button>
+      <button class="secondary" onclick="exportBackup()" data-vi="📥 Tải Backup (JSON)" data-en="📥 Export Backup (JSON)">📥 Tải Backup (JSON)</button>
+      <button class="light" onclick="importBackup()" data-vi="📤 Mở Backup" data-en="📤 Import Backup">📤 Mở Backup</button>
+      <button class="danger" onclick="deleteCurrentDate()" data-vi="🗑️ Xóa ngày hiện tại" data-en="🗑️ Delete Current Day">🗑️ Xóa ngày hiện tại</button>
+      <span class="status-toast" id="statusMsg"></span>
+    </div>
+    <footer class="credits">
+      <span>Design by KKDoremi ✨🎶</span>
+    </footer>
+  </div>
+
+  <!-- MODAL QUẢN LÝ DANH MỤC -->
+  <div class="modal-overlay" id="categoryModal">
+    <div class="modal">
+      <h3 id="modalTitle">⚙️ Quản lý Danh mục</h3>
+      <p class="hint" data-vi="Thêm, sửa hoặc xóa các danh mục bên dưới:" data-en="Add, edit, or delete categories below:">Thêm, sửa hoặc xóa các danh mục bên dưới:</p>
+      <ul class="category-list" id="categoryListContainer"></ul>
+      <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+        <input type="text" id="newCategoryInput" data-ph-vi="Nhập tên danh mục mới..." data-ph-en="Enter new category name..." placeholder="Nhập tên danh mục mới..." />
+        <button type="button" class="secondary" onclick="addNewCategory()" data-vi="+ Thêm" data-en="+ Add">+ Thêm</button>
+      </div>
+      <div style="text-align: right; display: flex; gap: 8px; justify-content: flex-end;">
+        <button type="button" class="light" onclick="closeCategoryModal()" data-vi="Hủy" data-en="Cancel">Hủy</button>
+        <button type="button" class="success" onclick="saveCategories()" data-vi="Lưu danh mục" data-en="Save Categories">Lưu danh mục</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentLang = localStorage.getItem('KK_LANG') || 'vi';
+
+    let taskCategories = JSON.parse(localStorage.getItem('KK_TASK_CATEGORIES') || '["Khách hàng", "Hồ sơ", "KPI/Doanh số", "Nội bộ", "Cá nhân"]');
+    let customerCategories = JSON.parse(localStorage.getItem('KK_CUST_CATEGORIES') || '["Khách nóng", "Khách ấm", "Khách lạnh", "Chăm sóc định kỳ"]');
+    
+    let activeModalType = 'task';
+
+    const defaultData = {
+      mainGoal: '', top3Tasks: '', kpiFocus: '', topRisks: '',
+      statContacted: '', statResponded: '', statAppointments: '', statProgressLoans: '', statStuckLoans: '', statKpiResult: '',
+      carryOverTasks: '', lessonsLearned: '', tomorrowTop3: '',
+      tblSchedule: [
+        { startTime: '08:00', endTime: '08:30', group: 'Đầu ngày', content: 'Xem lịch, tin nhắn, email, việc tồn', priority: 'Cao', status: 'Chưa làm', note: '' },
+        { startTime: '08:30', endTime: '10:30', group: 'Khách hàng/KPI', content: 'Gọi khách nóng, xử lý việc tạo doanh số', priority: 'Cao', status: 'Chưa làm', note: '' },
+        { startTime: '10:30', endTime: '12:00', group: 'Hồ sơ', content: 'Kiểm tra hồ sơ, bổ sung giấy tờ, đôn đốc nội bộ', priority: 'Cao', status: 'Chưa làm', note: '' },
+        { startTime: '13:30', endTime: '15:30', group: 'Follow-up', content: 'Gọi lại khách, chăm sóc khách cũ, cập nhật nhu cầu', priority: 'Trung bình', status: 'Chưa làm', note: '' },
+        { startTime: '15:30', endTime: '17:00', group: 'Pipeline', content: 'Tìm khách mới, xin referral, cập nhật danh sách tiềm năng', priority: 'Trung bình', status: 'Chưa làm', note: '' },
+        { startTime: '17:00', endTime: '17:30', group: 'Tổng kết', content: 'Cập nhật kết quả, việc tồn, kế hoạch ngày mai', priority: 'Cao', status: 'Chưa làm', note: '' }
+      ],
+      tblTasks: [
+        { task: '', group: taskCategories[0] || 'Khách hàng', customer: '', deadline: '', priority: 'Cao', status: 'Chưa làm', nextStep: '', note: '' }
+      ],
+      tblCustomers: [
+        { name: '', group: customerCategories[0] || 'Khách nóng', need: '', product: 'Tiền gửi', lastContact: '', nextTask: '', followDate: '', priority: 'Cao', note: '' }
+      ],
+      tblLoans: [
+        { name: '', product: '', amount: '', status: 'Mới nhận', issue: '', contact: '', deadline: '', nextAction: '', note: '' }
+      ],
+      tblPipeline: [
+        { name: '', source: 'Referral', product: '', interest: 'Cao', closeRate: 'Cao', nextAction: '', recallDate: '', note: '' }
+      ]
+    };
+
+    let allDailyStore = JSON.parse(localStorage.getItem('KK_DAILY_WORK_DATA') || '{}');
+    let currentDate = getTodayString();
+
+    window.onload = function() {
+      document.getElementById('currentDateSelect').value = currentDate;
+      updateHistoryDropdown();
+      renderCustomerPills();
+      loadDateData(currentDate);
+      switchLang(currentLang);
+    };
+
+    function switchLang(lang) {
+      currentLang = lang;
+      localStorage.setItem('KK_LANG', lang);
+      document.getElementById('langSelect').value = lang;
+
+      document.querySelectorAll('[data-vi][data-en]').forEach(el => {
+        el.textContent = el.getAttribute(`data-${lang}`);
+      });
+
+      document.querySelectorAll('[data-ph-vi][data-ph-en]').forEach(el => {
+        el.placeholder = el.getAttribute(`data-ph-${lang}`);
+      });
+
+      updateDateHighlight(currentDate);
+    }
+
+    function getTodayString() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function goToToday() {
+      currentDate = getTodayString();
+      document.getElementById('currentDateSelect').value = currentDate;
+      loadDateData(currentDate);
+    }
+
+    function changeDate() {
+      const val = document.getElementById('currentDateSelect').value;
+      if (val) {
+        currentDate = val;
+        loadDateData(currentDate);
+      }
+    }
+
+    function loadSelectedHistoryDate() {
+      const val = document.getElementById('historyDates').value;
+      if (val) {
+        currentDate = val;
+        document.getElementById('currentDateSelect').value = currentDate;
+        loadDateData(currentDate);
+      }
+    }
+
+    function updateHistoryDropdown() {
+      const select = document.getElementById('historyDates');
+      const defaultOptText = currentLang === 'en' ? '-- Select saved date --' : '-- Chọn ngày đã lưu --';
+      select.innerHTML = `<option value="">${defaultOptText}</option>`;
+      const dates = Object.keys(allDailyStore).sort().reverse();
+      dates.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.textContent = `${currentLang === 'en' ? 'Date' : 'Ngày'} ${d}`;
+        select.appendChild(opt);
+      });
+    }
+
+    function renderCustomerPills() {
+      const pillContainer = document.getElementById('customerPillList');
+      pillContainer.innerHTML = customerCategories.map(c => `<span class="pill">${c}</span>`).join('');
+    }
+
+    function updateDateHighlight(dateStr) {
+      const dateInput = document.getElementById('currentDateSelect');
+      if (allDailyStore[dateStr]) {
+        dateInput.classList.add('has-data');
+      } else {
+        dateInput.classList.remove('has-data');
+      }
+    }
+
+    function loadDateData(dateStr) {
+      const data = allDailyStore[dateStr] || defaultData;
+      
+      ['mainGoal', 'top3Tasks', 'kpiFocus', 'topRisks', 'statContacted', 'statResponded', 
+       'statAppointments', 'statProgressLoans', 'statStuckLoans', 'statKpiResult', 
+       'carryOverTasks', 'lessonsLearned', 'tomorrowTop3'].forEach(id => {
+        document.getElementById(id).value = data[id] || '';
+      });
+
+      renderTable('tblSchedule', data.tblSchedule || defaultData.tblSchedule, createScheduleRowHTML);
+      renderTable('tblTasks', data.tblTasks || defaultData.tblTasks, createTasksRowHTML);
+      renderTable('tblCustomers', data.tblCustomers || defaultData.tblCustomers, createCustomersRowHTML);
+      renderTable('tblLoans', data.tblLoans || defaultData.tblLoans, createLoansRowHTML);
+      renderTable('tblPipeline', data.tblPipeline || defaultData.tblPipeline, createPipelineRowHTML);
+
+      updateDateHighlight(dateStr);
+      showStatus(`${currentLang === 'en' ? 'Loaded data for' : 'Đã tải dữ liệu ngày'} ${dateStr}`);
+    }
+
+    function saveData() {
+      const data = {
+        mainGoal: document.getElementById('mainGoal').value,
+        top3Tasks: document.getElementById('top3Tasks').value,
+        kpiFocus: document.getElementById('kpiFocus').value,
+        topRisks: document.getElementById('topRisks').value,
+        statContacted: document.getElementById('statContacted').value,
+        statResponded: document.getElementById('statResponded').value,
+        statAppointments: document.getElementById('statAppointments').value,
+        statProgressLoans: document.getElementById('statProgressLoans').value,
+        statStuckLoans: document.getElementById('statStuckLoans').value,
+        statKpiResult: document.getElementById('statKpiResult').value,
+        carryOverTasks: document.getElementById('carryOverTasks').value,
+        lessonsLearned: document.getElementById('lessonsLearned').value,
+        tomorrowTop3: document.getElementById('tomorrowTop3').value,
+        
+        tblSchedule: getTableData('tblSchedule', ['startTime', 'endTime', 'group', 'content', 'priority', 'status', 'note']),
+        tblTasks: getTableData('tblTasks', ['task', 'group', 'customer', 'deadline', 'priority', 'status', 'nextStep', 'note']),
+        tblCustomers: getTableData('tblCustomers', ['name', 'group', 'need', 'product', 'lastContact', 'nextTask', 'followDate', 'priority', 'note']),
+        tblLoans: getTableData('tblLoans', ['name', 'product', 'amount', 'status', 'issue', 'contact', 'deadline', 'nextAction', 'note']),
+        tblPipeline: getTableData('tblPipeline', ['name', 'source', 'product', 'interest', 'closeRate', 'nextAction', 'recallDate', 'note'])
+      };
+
+      allDailyStore[currentDate] = data;
+      localStorage.setItem('KK_DAILY_WORK_DATA', JSON.stringify(allDailyStore));
+      updateHistoryDropdown();
+      updateDateHighlight(currentDate);
+      showStatus(`✅ ${currentLang === 'en' ? 'Data saved successfully for' : 'Đã lưu dữ liệu thành công cho ngày'} ${currentDate}!`);
+    }
+
+    function deleteCurrentDate() {
+      if (!allDailyStore[currentDate]) {
+        alert(currentLang === 'en' ? 'Current date is not saved yet!' : 'Ngày hiện tại chưa được lưu trong cơ sở dữ liệu!');
+        return;
+      }
+      const confirmMsg = currentLang === 'en' ? `Are you sure you want to delete all data for ${currentDate}?` : `Bạn có chắc muốn xóa toàn bộ dữ liệu ngày ${currentDate}?`;
+      if (confirm(confirmMsg)) {
+        delete allDailyStore[currentDate];
+        localStorage.setItem('KK_DAILY_WORK_DATA', JSON.stringify(allDailyStore));
+        updateHistoryDropdown();
+        loadDateData(currentDate);
+        showStatus(`❌ ${currentLang === 'en' ? 'Deleted data for' : 'Đã xóa dữ liệu ngày'} ${currentDate}`);
+      }
+    }
+
+    function renderTable(tableId, rowsData, rowGenerator) {
+      const tbody = document.getElementById(tableId).querySelector('tbody');
+      tbody.innerHTML = '';
+      rowsData.forEach(rowData => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = rowGenerator(rowData);
+        tbody.appendChild(tr);
+      });
+    }
+
+    function getTableData(tableId, keys) {
+      const rows = document.getElementById(tableId).querySelectorAll('tbody tr');
+      const list = [];
+      rows.forEach(tr => {
+        const inputs = tr.querySelectorAll('input, select, textarea');
+        if (inputs.length >= keys.length) {
+          let item = {};
+          keys.forEach((key, index) => {
+            item[key] = inputs[index].value;
+          });
+          list.push(item);
+        }
+      });
+      return list;
+    }
+
+    function addRow(tableId) {
+      const tbody = document.getElementById(tableId).querySelector('tbody');
+      const tr = document.createElement('tr');
+      if (tableId === 'tblSchedule') tr.innerHTML = createScheduleRowHTML({});
+      else if (tableId === 'tblTasks') tr.innerHTML = createTasksRowHTML({});
+      else if (tableId === 'tblCustomers') tr.innerHTML = createCustomersRowHTML({});
+      else if (tableId === 'tblLoans') tr.innerHTML = createLoansRowHTML({});
+      else if (tableId === 'tblPipeline') tr.innerHTML = createPipelineRowHTML({});
+      tbody.appendChild(tr);
+    }
+
+    function removeRow(btn) {
+      const tr = btn.closest('tr');
+      tr.remove();
+    }
+
+    function createScheduleRowHTML(d) {
+      return `
+        <td>
+          <div class="time-picker-range">
+            <input type="time" value="${d.startTime || '08:00'}" />
+            <span>–</span>
+            <input type="time" value="${d.endTime || '09:00'}" />
+          </div>
+        </td>
+        <td><input value="${d.group || ''}" /></td>
+        <td><textarea>${d.content || ''}</textarea></td>
+        <td>${createSelect(['Cao', 'Trung bình', 'Thấp'], d.priority)}</td>
+        <td>${createSelect(['Chưa làm', 'Đang làm', 'Hoàn tất'], d.status)}</td>
+        <td><textarea>${d.note || ''}</textarea></td>
+        <td><button type="button" class="btn-row-action" onclick="removeRow(this)">✕</button></td>
+      `;
+    }
+
+    function createTasksRowHTML(d) {
+      return `
+        <td><textarea>${d.task || ''}</textarea></td>
+        <td>${createSelect(taskCategories, d.group)}</td>
+        <td><input value="${d.customer || ''}" /></td>
+        <td><input type="date" value="${d.deadline || ''}" /></td>
+        <td>${createSelect(['Cao', 'Trung bình', 'Thấp'], d.priority)}</td>
+        <td>${createSelect(['Chưa làm', 'Đang làm', 'Chờ phản hồi', 'Hoàn tất', 'Dời sang ngày mai', 'Hủy'], d.status)}</td>
+        <td><textarea>${d.nextStep || ''}</textarea></td>
+        <td><textarea>${d.note || ''}</textarea></td>
+        <td><button type="button" class="btn-row-action" onclick="removeRow(this)">✕</button></td>
+      `;
+    }
+
+    function createCustomersRowHTML(d) {
+      return `
+        <td><input value="${d.name || ''}" /></td>
+        <td>${createSelect(customerCategories, d.group)}</td>
+        <td><textarea>${d.need || ''}</textarea></td>
+        <td>${createSelect(['Tiền gửi', 'Vay', 'Thẻ', 'Bảo hiểm', 'Đầu tư', 'Tài khoản'], d.product)}</td>
+        <td><input type="date" value="${d.lastContact || ''}" /></td>
+        <td><textarea>${d.nextTask || ''}</textarea></td>
+        <td><input type="date" value="${d.followDate || ''}" /></td>
+        <td>${createSelect(['Cao', 'Trung bình', 'Thấp'], d.priority)}</td>
+        <td><textarea>${d.note || ''}</textarea></td>
+        <td><button type="button" class="btn-row-action" onclick="removeRow(this)">✕</button></td>
+      `;
+    }
+
+    function createLoansRowHTML(d) {
+      return `
+        <td><input value="${d.name || ''}" /></td>
+        <td><input value="${d.product || ''}" /></td>
+        <td><input type="number" value="${d.amount || ''}" /></td>
+        <td>${createSelect(['Mới nhận', 'Đang bổ sung', 'Chờ khách', 'Chờ nội bộ', 'Chờ phê duyệt', 'Hoàn tất', 'Tạm dừng'], d.status)}</td>
+        <td><textarea>${d.issue || ''}</textarea></td>
+        <td><input value="${d.contact || ''}" /></td>
+        <td><input type="date" value="${d.deadline || ''}" /></td>
+        <td><textarea>${d.nextAction || ''}</textarea></td>
+        <td><textarea>${d.note || ''}</textarea></td>
+        <td><button type="button" class="btn-row-action" onclick="removeRow(this)">✕</button></td>
+      `;
+    }
+
+    function createPipelineRowHTML(d) {
+      return `
+        <td><input value="${d.name || ''}" /></td>
+        <td>${createSelect(['Referral', 'Khách cũ giới thiệu', 'Sự kiện/Networking', 'Data nội bộ', 'Khác'], d.source)}</td>
+        <td><input value="${d.product || ''}" /></td>
+        <td>${createSelect(['Cao', 'Trung bình', 'Thấp'], d.interest)}</td>
+        <td>${createSelect(['Cao', 'Trung bình', 'Thấp'], d.closeRate)}</td>
+        <td><textarea>${d.nextAction || ''}</textarea></td>
+        <td><input type="date" value="${d.recallDate || ''}" /></td>
+        <td><textarea>${d.note || ''}</textarea></td>
+        <td><button type="button" class="btn-row-action" onclick="removeRow(this)">✕</button></td>
+      `;
+    }
+
+    function createSelect(options, selectedVal) {
+      let html = '<select>';
+      options.forEach(opt => {
+        const selected = opt === selectedVal ? 'selected' : '';
+        html += `<option value="${opt}" ${selected}>${opt}</option>`;
+      });
+      html += '</select>';
+      return html;
+    }
+
+    function openCategoryModal(type) {
+      activeModalType = type;
+      const titleEl = document.getElementById('modalTitle');
+      const container = document.getElementById('categoryListContainer');
+      container.innerHTML = '';
+
+      const categories = type === 'task' ? taskCategories : customerCategories;
+      titleEl.textContent = type === 'task' 
+        ? (currentLang === 'en' ? '⚙️ Manage Task Categories (Sec 3)' : '⚙️ Quản lý Nhóm việc (Mục 3)')
+        : (currentLang === 'en' ? '⚙️ Manage Customer Groups (Sec 4)' : '⚙️ Quản lý Nhóm khách hàng (Mục 4)');
+
+      categories.forEach(cat => {
+        const li = document.createElement('li');
+        li.className = 'category-item';
+        li.innerHTML = `
+          <input type="text" value="${cat}" class="cat-input" />
+          <button type="button" class="btn-row-action" onclick="this.parentElement.remove()">✕</button>
+        `;
+        container.appendChild(li);
+      });
+
+      document.getElementById('categoryModal').style.display = 'flex';
+    }
+
+    function closeCategoryModal() {
+      document.getElementById('categoryModal').style.display = 'none';
+    }
+
+    function addNewCategory() {
+      const input = document.getElementById('newCategoryInput');
+      const val = input.value.trim();
+      if (!val) return;
+      
+      const container = document.getElementById('categoryListContainer');
+      const li = document.createElement('li');
+      li.className = 'category-item';
+      li.innerHTML = `
+        <input type="text" value="${val}" class="cat-input" />
+        <button type="button" class="btn-row-action" onclick="this.parentElement.remove()">✕</button>
+      `;
+      container.appendChild(li);
+      input.value = '';
+    }
+
+    function saveCategories() {
+      const catInputs = document.querySelectorAll('.cat-input');
+      const newCategories = [];
+      catInputs.forEach(input => {
+        const val = input.value.trim();
+        if (val) newCategories.push(val);
+      });
+
+      if (newCategories.length === 0) {
+        alert(currentLang === 'en' ? 'Must have at least 1 category!' : 'Phải có ít nhất 1 danh mục!');
+        return;
+      }
+
+      if (activeModalType === 'task') {
+        taskCategories = newCategories;
+        localStorage.setItem('KK_TASK_CATEGORIES', JSON.stringify(taskCategories));
+        const currentTaskData = getTableData('tblTasks', ['task', 'group', 'customer', 'deadline', 'priority', 'status', 'nextStep', 'note']);
+        renderTable('tblTasks', currentTaskData, createTasksRowHTML);
+      } else {
+        customerCategories = newCategories;
+        localStorage.setItem('KK_CUST_CATEGORIES', JSON.stringify(customerCategories));
+        renderCustomerPills();
+        const currentCustomerData = getTableData('tblCustomers', ['name', 'group', 'need', 'product', 'lastContact', 'nextTask', 'followDate', 'priority', 'note']);
+        renderTable('tblCustomers', currentCustomerData, createCustomersRowHTML);
+      }
+
+      closeCategoryModal();
+      showStatus(`✅ ${currentLang === 'en' ? 'Categories updated successfully!' : 'Đã cập nhật danh mục thành công!'}`);
+    }
+
+    function filterContent() {
+      const keyword = document.getElementById('searchInput').value.toLowerCase();
+      const rows = document.querySelectorAll('tbody tr');
+      rows.forEach(tr => {
+        const text = tr.innerText.toLowerCase();
+        const inputs = Array.from(tr.querySelectorAll('input, textarea, select')).map(i => i.value.toLowerCase()).join(' ');
+        if (text.includes(keyword) || inputs.includes(keyword)) {
+          tr.style.display = '';
+        } else {
+          tr.style.display = 'none';
+        }
+      });
+    }
+
+    function exportBackup() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allDailyStore, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `backup_work_data_${getTodayString()}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importBackup() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = e => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.readAsText(file, 'UTF-8');
+        reader.onload = readerEvent => {
+          try {
+            const content = JSON.parse(readerEvent.target.result);
+            if (confirm(currentLang === 'en' ? 'Overwrite current system with this backup file?' : 'Bạn có muốn đè dữ liệu từ file backup này vào hệ thống?')) {
+              allDailyStore = content;
+              localStorage.setItem('KK_DAILY_WORK_DATA', JSON.stringify(allDailyStore));
+              updateHistoryDropdown();
+              loadDateData(currentDate);
+              alert(currentLang === 'en' ? 'Data restored successfully!' : 'Đã phục hồi dữ liệu thành công!');
+            }
+          } catch (err) {
+            alert(currentLang === 'en' ? 'Invalid JSON file!' : 'File không hợp lệ!');
+          }
+        }
+      }
+      input.click();
+    }
+
+    function showStatus(msg) {
+      const el = document.getElementById('statusMsg');
+      el.textContent = msg;
+      setTimeout(() => { if(el.textContent === msg) el.textContent = ''; }, 4000);
+    }
+  </script>
+</body>
+</html>
