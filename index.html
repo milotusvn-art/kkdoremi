@@ -351,6 +351,25 @@
       min-width: 180px;
     }
 
+    .cloud-fields {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    .cloud-auth.is-open .cloud-fields {
+      display: flex;
+    }
+
+    .cloud-action-buttons {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
     .cloud-user {
       color: var(--muted);
       font-size: 13px;
@@ -496,7 +515,9 @@
 
       .cloud-auth input,
       .cloud-auth button,
-      .cloud-user {
+      .cloud-user,
+      .cloud-fields,
+      .cloud-action-buttons {
         width: 100%;
       }
 
@@ -760,10 +781,16 @@
       </div>
 
       <div class="filter-group cloud-auth">
-        <input type="email" id="cloudEmail" placeholder="Email cloud" autocomplete="email" />
-        <input type="password" id="cloudPassword" placeholder="Mật khẩu cloud" autocomplete="current-password" />
-        <button type="button" class="btn-sm secondary" onclick="cloudSignIn()" data-vi="Đăng nhập cloud" data-en="Cloud Login">Đăng nhập cloud</button>
-        <button type="button" class="btn-sm light" onclick="cloudSignUp()" data-vi="Tạo tài khoản" data-en="Sign Up">Tạo tài khoản</button>
+        <div class="cloud-action-buttons">
+          <button type="button" class="btn-sm secondary" onclick="showCloudForm('signin')" data-vi="Đăng nhập cloud" data-en="Cloud Login">Đăng nhập cloud</button>
+          <button type="button" class="btn-sm light" onclick="showCloudForm('signup')" data-vi="Tạo tài khoản" data-en="Sign Up">Tạo tài khoản</button>
+        </div>
+        <div class="cloud-fields" id="cloudFields">
+          <input type="email" id="cloudEmail" placeholder="Email cloud" autocomplete="email" />
+          <input type="password" id="cloudPassword" placeholder="Mật khẩu cloud" autocomplete="current-password" />
+          <button type="button" class="btn-sm secondary" id="cloudSubmitBtn" onclick="submitCloudForm()">Tiếp tục</button>
+          <button type="button" class="btn-sm light" onclick="hideCloudForm()" data-vi="Ẩn" data-en="Hide">Ẩn</button>
+        </div>
         <button type="button" class="btn-sm danger" onclick="cloudSignOut()" data-vi="Đăng xuất" data-en="Sign Out">Đăng xuất</button>
         <span class="cloud-user" id="cloudUserStatus">Cloud: chưa đăng nhập</span>
       </div>
@@ -1020,6 +1047,7 @@
     let allDailyStore = JSON.parse(localStorage.getItem('KK_DAILY_WORK_DATA') || '{}');
     let currentDate = getTodayString();
     let cloudSession = getStoredCloudSession();
+    let cloudFormMode = 'signin';
 
     window.onload = function() {
       document.getElementById('currentDateSelect').value = currentDate;
@@ -1127,6 +1155,31 @@
       if (!status) return;
       const email = cloudSession && cloudSession.user && cloudSession.user.email;
       status.textContent = email ? `Cloud: ${email}` : 'Cloud: chưa đăng nhập';
+    }
+
+    function showCloudForm(mode) {
+      cloudFormMode = mode;
+      const authBox = document.querySelector('.cloud-auth');
+      const submitBtn = document.getElementById('cloudSubmitBtn');
+      if (authBox) authBox.classList.add('is-open');
+      if (submitBtn) {
+        submitBtn.textContent = mode === 'signup' ? 'Tạo tài khoản' : 'Đăng nhập';
+      }
+      const emailInput = document.getElementById('cloudEmail');
+      if (emailInput) emailInput.focus();
+    }
+
+    function hideCloudForm() {
+      const authBox = document.querySelector('.cloud-auth');
+      if (authBox) authBox.classList.remove('is-open');
+    }
+
+    function submitCloudForm() {
+      if (cloudFormMode === 'signup') {
+        cloudSignUp();
+      } else {
+        cloudSignIn();
+      }
     }
 
     function normalizeCloudSession(authData) {
